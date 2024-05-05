@@ -1,26 +1,40 @@
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.db.models import Max
-
+from rest_framework import status
 
 # import models
 from .models import FileModel, FileComparisonModel, AIDetection, TxtFileModel, User, OcrResult
 
 # import serializers
-from .serializers import FileSerializer, AIDetectionSerializer, OcrResultSerializer
+from .serializers import FileSerializer, AIDetectionSerializer, OcrResultSerializer, FileModelSerializer
 
+
+# @api_view(['POST'])
+# def upload_file(request):
+#     filename = request.data.get('selectedFile')
+#     description = request.data.get('desc')
+#     file = request.data.get('file')
+
+
+#     # file_model = FileModel(
+#     #     filename=filename, description=description, file=file)
+#     # file_model.save()
 
 @api_view(['POST'])
 def upload_file(request):
-    filename = request.data.get('selectedFile')
-    description = request.data.get('desc')
-    file = request.data.get('file')
-    file_model = FileModel(
-        filename=filename, description=description, file=file)
-    file_model.save()
+    # Deserialize the request data using a serializer
+    serializer = FileModelSerializer(data=request.data)
+    
+    # Validate the deserialized data
+    if serializer.is_valid():
+        # Create and save the FileModel instance
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -119,6 +133,7 @@ def login_view(request):
     else:
         return Response({"error": "Login failed"}, status=400)
 
+
 @api_view(['GET'])
 def ocr_Results(request, pk):
     ocr_result = OcrResult.objects.get(uploaded_by__user_id=pk)
@@ -127,4 +142,3 @@ def ocr_Results(request, pk):
     serializer = OcrResultSerializer(ocr_result)
     print(uploaded_by_user_id)
     return Response(serializer.data)
-   

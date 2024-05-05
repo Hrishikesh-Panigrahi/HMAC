@@ -4,8 +4,6 @@ from base.models import User
 from .models import FileModel, FileComparisonModel, AIDetection, OcrResult
 from django.contrib.auth import authenticate
 
-
-
 class UserRegisterSerializer(ModelSerializer):
     class Meta:
         model = User
@@ -25,13 +23,11 @@ class UserSerializer(ModelSerializer):
         model = User
         fields = '__all__'
 
-
 class FileSerializer(ModelSerializer):
     uploaded_by = UserSerializer()
     class Meta:
         model = FileModel
         fields = '__all__'
-
 
 class UserLoginSerializer(ModelSerializer):
     class Meta:
@@ -50,7 +46,6 @@ class UserLoginSerializer(ModelSerializer):
             raise serializers.ValidationError("Invalid Credentials")
         return user
 
-
 class FileComparisonSerializer(serializers.ModelSerializer):
     uploaded_file = FileSerializer()
     other_file = FileSerializer()
@@ -68,7 +63,11 @@ class AIDetectionSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['uploaded_by'] = instance.uploaded_by.email  # Assuming 'username' is a field in your User model
         return representation
-    
+
+class FileModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileModel
+        fields = ['id', 'uploaded_by', 'filename', 'description', 'file']
 
 class OcrResultSerializer(serializers.ModelSerializer):
     class Meta:

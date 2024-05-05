@@ -34,7 +34,7 @@ const Student = () => {
     formData.append('desc', desc);
     formData.append('file', file);
 
-    axios.post('http://127.0.0.1:8000/Upload/', formData)
+    axios.post('http://localhost:8000/api/v1/Upload/', formData, { withCredentials: true })
     .then(() => {
         console.log('File uploaded successfully');
     })
