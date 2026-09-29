@@ -28,6 +28,10 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# Folder holding Poppler's pdftoppm, used to turn uploaded PDFs into images.
+# Leave unset when Poppler is on PATH.
+POPPLER_PATH = os.environ.get('POPPLER_PATH') or None
+
 # Word-detection model used by the OCR step (helper.roboflowHelperFunc).
 ROBOFLOW_API_KEY = os.environ.get('ROBOFLOW_API_KEY', '')
 

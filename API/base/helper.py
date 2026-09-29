@@ -1,9 +1,24 @@
+import os
+import tempfile
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from roboflow import Roboflow
 import cv2
 
-def roboflowHelperFunc(instance):
+
+def transcribe_page(instance):
+    """Find the words on a page image and read them with TrOCR.
+
+    Word crops go into a throwaway folder that is removed even when OCR fails,
+    so a crashed upload can't break the next one.
+    """
+    with tempfile.TemporaryDirectory(prefix="hmac-ocr-") as work_dir:
+        lines = roboflowHelperFunc(instance, work_dir)
+        return ocrHelperFunc(lines, work_dir)
+
+
+def roboflowHelperFunc(instance, work_dir):
     if not settings.ROBOFLOW_API_KEY:
         raise ImproperlyConfigured("Set ROBOFLOW_API_KEY in API/.env (see API/.env.example).")
     rf = Roboflow(api_key=settings.ROBOFLOW_API_KEY)
@@ -60,7 +75,7 @@ def roboflowHelperFunc(instance):
 
     # Save or use the array of word images as needed
     for i, word_image in enumerate(word_images):
-        cv2.imwrite(f"C:/Users/Nandini/Documents/GitHub/HMAC/API/OCR/testing/words_{i+1}.jpg", word_image)
+        cv2.imwrite(os.path.join(work_dir, f"words_{i+1}.jpg"), word_image)
 
     box_dimensions = sorted(box_dimensions, key=lambda box: (box["y"]))
 
@@ -109,12 +124,10 @@ def hconcat_resize_batch(img_list, batch_size, interpolation=cv2.INTER_CUBIC):
 
     return result_images
 
-def ocrHelperFunc(lines):
-    folder_name = "testing"
-
+def ocrHelperFunc(lines, work_dir):
     sorted_lines = lines
 
-    image_paths = [f"C:/Users/Nandini/Documents/GitHub/HMAC/API/OCR/{folder_name}/words_{line['index']}.jpg" for line in sorted_lines]
+    image_paths = [os.path.join(work_dir, f"words_{line['index']}.jpg") for line in sorted_lines]
 
     images = [cv2.imread(img_path) for img_path in image_paths]
 
@@ -129,7 +142,6 @@ def ocrHelperFunc(lines):
     predicted_words_string = ' '.join(all_predictions)
 
     print(f"Predicted Words: {predicted_words_string}")
-    deleteImages()
     return predicted_words_string
 
 def generate_ocr_batch(image_batch):
@@ -144,18 +156,3 @@ def generate_ocr_batch(image_batch):
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)
 
     return generated_text
-
-def deleteImages():
-    import shutil
-
-    shutil.rmtree('C:/Users/Nandini/Documents/GitHub/HMAC/API/OCR/testing/')
-
-def makeDir():
-    import os 
-    directory = "testing"
- 
-    parent_dir = "C:/Users/Nandini/Documents/GitHub/HMAC/API/OCR/"
-
-    path = os.path.join(parent_dir, directory) 
-
-    os.mkdir(path)

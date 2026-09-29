@@ -7,7 +7,7 @@ import os
 from pdf2image import convert_from_path
 
 from .models import FileModel, FileImage, AIDetection, TxtFileModel, FileComparisonModel, User, FileModel, TxtFileModel, OcrResult
-from .helper import roboflowHelperFunc, ocrHelperFunc, makeDir
+from .helper import transcribe_page
 from .similarity import recompute_assignment
 
 import torch
@@ -26,8 +26,7 @@ def convert_pdf_to_image(sender, instance, created, **kwargs):
         cover_page_dir = os.path.join(
             settings.MEDIA_ROOT, COVER_PAGE_DIRECTORY)
 
-        if not os.path.exists(cover_page_dir):
-            os.mkdir(cover_page_dir)
+        os.makedirs(cover_page_dir, exist_ok=True)
 
         # convert page cover (in this case) to jpg and save
         cover_page_image = convert_from_path(
@@ -37,7 +36,8 @@ def convert_pdf_to_image(sender, instance, created, **kwargs):
             last_page=1,
             fmt=COVER_PAGE_FORMAT,
             output_folder=cover_page_dir,
-            poppler_path=r"C:\Users\Nandini\Downloads\Release-23.11.0-0\poppler-23.11.0\Library\bin"
+            # None means "find Poppler on PATH"; set POPPLER_PATH in API/.env otherwise.
+            poppler_path=settings.POPPLER_PATH,
         )[0]
 
         cover_page_image.close()
@@ -80,13 +80,7 @@ def create_ai_detection(sender, instance, created, **kwargs):
             model_path, num_labels=num_labels)
         Bert_Model.eval()
 
-        makeDir()
-
-        lines = roboflowHelperFunc(instance)
-
-        # print("Type of 'detections':", type(lines))
-
-        text = ocrHelperFunc(lines)
+        text = transcribe_page(instance)
 
         import Levenshtein
 
