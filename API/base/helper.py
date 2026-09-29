@@ -1,8 +1,12 @@
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from roboflow import Roboflow
 import cv2
 
 def roboflowHelperFunc(instance):
-    rf = Roboflow(api_key="pkTvzHUBUJW9XbfPJuU6")
+    if not settings.ROBOFLOW_API_KEY:
+        raise ImproperlyConfigured("Set ROBOFLOW_API_KEY in API/.env (see API/.env.example).")
+    rf = Roboflow(api_key=settings.ROBOFLOW_API_KEY)
     project = rf.workspace().project("word_detection-mtq4b")
     model = project.version(1).model
 
