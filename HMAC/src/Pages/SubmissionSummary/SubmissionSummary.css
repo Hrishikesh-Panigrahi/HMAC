@@ -1,3 +1,11 @@
+.summary-assignment {
+  min-width: 240px;
+}
+
+.summary-assignment .label {
+  margin-bottom: 0;
+}
+
 /* ---------- Stat index cards ---------- */
 
 .stats {

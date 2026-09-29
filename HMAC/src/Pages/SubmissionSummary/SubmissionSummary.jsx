@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { LogIn, RefreshCw, Search, X } from "lucide-react";
+import { LogIn, Plus, RefreshCw, Search, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import PageTransition from "../../Components/PageTransition/PageTransition";
@@ -10,6 +10,9 @@ import Sheet from "../../Components/Sheet/Sheet";
 import CountUp from "../../Components/CountUp/CountUp";
 import Annotation from "../../Components/Annotation/Annotation";
 import StudentRecord from "../../Components/StudentRecord/StudentRecord";
+import CompareModal from "../../Components/CompareModal/CompareModal";
+import NewAssignmentModal from "../../Components/NewAssignmentModal/NewAssignmentModal";
+import { API_BASE, authHeaders, isAuthError } from "../../utils/api";
 import { aiScoreOf, displayNameOf, needsReview } from "../../utils/submission";
 import "./SubmissionSummary.css";
 
@@ -29,14 +32,18 @@ const SubmissionSummary = () => {
   const [status, setStatus] = useState("loading"); // loading | ready | error | unauthorized
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
+  const [assignments, setAssignments] = useState([]);
+  const [assignment, setAssignment] = useState("all"); // "all" | "none" | assignment id
+  const [comparing, setComparing] = useState(null);
+  const [creating, setCreating] = useState(false);
 
   const fetchStudentRecords = useCallback(async () => {
     setStatus("loading");
     try {
       // The endpoint is staff-only; authenticate with the JWT saved at login.
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get("http://localhost:8000/api/v1/teacher/files/", {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      const response = await axios.get(`${API_BASE}/teacher/files/`, {
+        headers: authHeaders(),
+        params: assignment === "all" ? {} : { assignment },
       });
       if (response.status === 200) {
         setData(response.data.file_data ?? []);
@@ -46,19 +53,38 @@ const SubmissionSummary = () => {
         setStatus("error");
       }
     } catch (error) {
-      const code = error.response?.status;
-      if (code === 401 || code === 403) {
+      if (isAuthError(error)) {
         setStatus("unauthorized");
         return;
       }
       console.error("Network error:", error);
       setStatus("error");
     }
+  }, [assignment]);
+
+  const fetchAssignments = useCallback(() => {
+    axios
+      .get(`${API_BASE}/assignments/`, { headers: authHeaders() })
+      .then((response) => setAssignments(response.data))
+      .catch(() => setAssignments([]));
   }, []);
 
   useEffect(() => {
     fetchStudentRecords();
   }, [fetchStudentRecords]);
+
+  useEffect(() => {
+    fetchAssignments();
+  }, [fetchAssignments]);
+
+  const handleCreated = (created) => {
+    setCreating(false);
+    fetchAssignments();
+    setAssignment(String(created.id));
+  };
+
+  const closeCompare = useCallback(() => setComparing(null), []);
+  const closeCreate = useCallback(() => setCreating(false), []);
 
   const flaggedCount = useMemo(() => data.filter(needsReview).length, [data]);
 
@@ -68,7 +94,7 @@ const SubmissionSummary = () => {
     return [
       { label: "Submissions", value: data.length, decimals: 0, suffix: "" },
       { label: "Avg. AI likelihood", value: average(aiScores), decimals: 1, suffix: "%" },
-      { label: "Avg. top similarity", value: average(similarities), decimals: 1, suffix: "%" },
+      { label: "Avg. closest match", value: average(similarities), decimals: 1, suffix: "%" },
       { label: "Need review", value: flaggedCount, decimals: 0, suffix: "", alert: true },
     ];
   }, [data, flaggedCount]);
@@ -96,12 +122,36 @@ const SubmissionSummary = () => {
         eyebrow="Professor workspace"
         title="Submission"
         accent="summary."
-        subtitle="AI-detection and similarity results for every assignment handed in."
+        subtitle="AI-detection and duplicate-content results. Answers are only compared with others for the same assignment."
         actions={
-          <button type="button" className="btn" onClick={fetchStudentRecords} disabled={status === "loading"}>
-            <RefreshCw size={16} className={status === "loading" ? "spin" : ""} />
-            Refresh
-          </button>
+          <>
+            <label className="select summary-assignment">
+              <span className="label">Assignment</span>
+              <select value={assignment} onChange={(e) => setAssignment(e.target.value)}>
+                <option value="all">All assignments</option>
+                {assignments.map((a) => (
+                  <option key={a.id} value={String(a.id)}>
+                    {a.title}
+                  </option>
+                ))}
+                <option value="none">No assignment (older uploads)</option>
+              </select>
+            </label>
+            <button type="button" className="btn" onClick={() => setCreating(true)}>
+              <Plus size={16} />
+              New assignment
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-icon"
+              onClick={fetchStudentRecords}
+              disabled={status === "loading"}
+              aria-label="Refresh"
+              title="Refresh"
+            >
+              <RefreshCw size={16} className={status === "loading" ? "spin" : ""} />
+            </button>
+          </>
         }
       />
 
@@ -210,9 +260,13 @@ const SubmissionSummary = () => {
             loading={status === "loading"}
             hasFilters={Boolean(query) || filter !== "all"}
             onResetFilters={resetFilters}
+            onCompare={setComparing}
           />
         </Sheet>
       )}
+
+      <CompareModal row={comparing} onClose={closeCompare} />
+      <NewAssignmentModal open={creating} onClose={closeCreate} onCreated={handleCreated} />
     </PageTransition>
   );
 };

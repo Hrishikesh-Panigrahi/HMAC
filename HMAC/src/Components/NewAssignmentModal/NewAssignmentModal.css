@@ -1,0 +1,15 @@
+.new-assignment {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.new-assignment__hint {
+  margin-top: 8px;
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.new-assignment .btn {
+  align-self: flex-start;
+}

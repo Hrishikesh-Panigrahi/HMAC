@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { LoaderCircle, RefreshCw, Send, Trash } from "lucide-react";
@@ -10,6 +10,7 @@ import Sheet from "../Sheet/Sheet";
 import Stamp from "../Stamp/Stamp";
 import Annotation from "../Annotation/Annotation";
 import InputWithLabel from "../InputWithLabel/InputWithLabel";
+import { API_BASE, authHeaders, isAuthError } from "../../utils/api";
 import "./Student.css";
 
 const DESCRIPTION_LIMIT = 500;
@@ -86,6 +87,22 @@ const Student = () => {
   const [status, setStatus] = useState("idle"); // idle | uploading | success
   const [progress, setProgress] = useState(0);
   const [attempted, setAttempted] = useState(false);
+  const [assignments, setAssignments] = useState([]);
+  const [assignmentsStatus, setAssignmentsStatus] = useState("loading"); // loading | ready | unauthorized | error
+  const [assignmentId, setAssignmentId] = useState("");
+
+  useEffect(() => {
+    axios
+      .get(`${API_BASE}/assignments/`, { headers: authHeaders() })
+      .then((response) => {
+        setAssignments(response.data);
+        setAssignmentsStatus("ready");
+      })
+      .catch((err) => setAssignmentsStatus(isAuthError(err) ? "unauthorized" : "error"));
+  }, []);
+
+  // Answers are only compared within an assignment, so pick one whenever any exist.
+  const needsAssignment = assignments.length > 0;
 
   const acceptFile = (candidate) => {
     if (!candidate) return;
@@ -156,23 +173,28 @@ const Student = () => {
       toast.error("Fix the file name", { description: "It must end with .pdf" });
       return;
     }
+    if (needsAssignment && !assignmentId) {
+      toast.error("Pick the assignment this is for");
+      return;
+    }
     if (!desc.trim()) {
       toast.error("Add a short description");
       return;
     }
 
-    // Field names must match FileModelSerializer (filename, description, file).
+    // Field names must match FileModelSerializer (filename, description, file, assignment).
     const formData = new FormData();
     formData.append("filename", selectedFile);
     formData.append("description", desc);
     formData.append("file", file);
+    if (assignmentId) formData.append("assignment", assignmentId);
 
     setStatus("uploading");
     setProgress(0);
 
     axios
-      .post("http://localhost:8000/api/v1/Upload/", formData, {
-        withCredentials: true,
+      .post(`${API_BASE}/Upload/`, formData, {
+        headers: authHeaders(),
         onUploadProgress: (event) => {
           if (event.total) setProgress(Math.round((event.loaded * 100) / event.total));
         },
@@ -183,13 +205,20 @@ const Student = () => {
       })
       .catch((err) => {
         setStatus("idle");
+        if (isAuthError(err)) {
+          toast.error("Sign in to hand in", { description: "Your session may have expired." });
+          return;
+        }
         toast.error("Upload failed", { description: describeUploadError(err) });
       });
   };
 
   const steps = [
     { label: "Choose PDF", done: Boolean(file) },
-    { label: "Add details", done: Boolean(file) && isValid && Boolean(desc.trim()) },
+    {
+      label: "Add details",
+      done: Boolean(file) && isValid && Boolean(desc.trim()) && (!needsAssignment || Boolean(assignmentId)),
+    },
     { label: "Hand in", done: status === "success" },
   ];
   const currentStep = steps.findIndex((step) => !step.done);
@@ -326,6 +355,28 @@ const Student = () => {
                 <span className="sheet__title">Details</span>
               </div>
               <div className="sheet__body upload-details">
+                <label className="select">
+                  <span className="label">Assignment</span>
+                  <select
+                    value={assignmentId}
+                    onChange={(e) => setAssignmentId(e.target.value)}
+                    disabled={uploading || !needsAssignment}
+                  >
+                    <option value="">{needsAssignment ? "Choose the assignment…" : "No assignments yet"}</option>
+                    {assignments.map((a) => (
+                      <option key={a.id} value={String(a.id)}>
+                        {a.title}
+                      </option>
+                    ))}
+                  </select>
+                  {assignmentsStatus === "unauthorized" && (
+                    <span className="field__hint">Sign in to see your assignments.</span>
+                  )}
+                  {assignmentsStatus === "ready" && !needsAssignment && (
+                    <span className="field__hint">Your professor hasn&apos;t set any yet; you can still hand in.</span>
+                  )}
+                </label>
+
                 <InputWithLabel
                   id="rename"
                   label="File name"

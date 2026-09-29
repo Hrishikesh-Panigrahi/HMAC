@@ -195,6 +195,15 @@
   font-size: 12.5px;
 }
 
+.review-explain__legend-label {
+  min-width: 76px;
+  color: var(--ink-subtle);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .review-explain__note {
   padding: 12px 16px;
   border-left: 3px solid var(--red);

@@ -67,8 +67,20 @@ class User(AbstractUser):
     def __str__(self):
         return str(self.email)
 
+class Assignment(models.Model):
+    title = models.CharField(max_length=255)
+    # Question paper or model answer. Phrases that appear here are ignored by duplicate detection.
+    reference_text = models.TextField(blank=True, default="")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="assignments")
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
 class FileModel(models.Model):
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    # Submissions are only compared with others handed in for the same assignment.
+    assignment = models.ForeignKey(Assignment, on_delete=models.SET_NULL, null=True, blank=True, related_name="submissions")
     filename = models.CharField(max_length=255)
     description = models.TextField()
     file = models.FileField(upload_to='files/')
@@ -98,6 +110,7 @@ class AIDetection(models.Model):
 
 class TxtFileModel(models.Model):
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    submission = models.ForeignKey(FileModel, on_delete=models.CASCADE, null=True, blank=True, related_name="txt_files")
     filename = models.CharField(max_length=255)
     description = models.TextField()
     file = models.FileField(upload_to='txtfiles/')
@@ -118,26 +131,27 @@ class TxtFileModel(models.Model):
             print(f"Error reading file '{self.filename}': {exc}")
             return ""
 
-    def save(self, *args, **kwargs):
-        if not self.uploaded_by:
-            self.uploaded_by = User.objects.get(Email='a@a.com')
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return self.filename
 
 class FileComparisonModel(models.Model):
+    # One row per direction: similarity_result is the share of uploaded_file's
+    # phrases that also appear in other_file.
     uploaded_file = models.ForeignKey(
         TxtFileModel, on_delete=models.CASCADE, related_name='uploaded_file')
     other_file = models.ForeignKey(
         TxtFileModel, on_delete=models.CASCADE, related_name='other_file')
     similarity_result = models.FloatField()
+    # Matched passages as character spans into each file's OCR text:
+    # {"self": [[start, end], ...], "other": [[start, end], ...]}
+    matches = models.JSONField(default=dict, blank=True)
 
     def __str__(self):
         return f"Comparison between {self.uploaded_file.filename} and {self.other_file.filename}"
 
 class OcrResult(models.Model):
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    submission = models.ForeignKey(FileModel, on_delete=models.CASCADE, null=True, blank=True, related_name="ocr_results")
     filename = models.CharField(max_length=255)
     ocr_results = models.TextField()
 

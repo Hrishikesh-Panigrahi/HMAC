@@ -127,14 +127,24 @@ const TeachersView = () => {
                       Duplicate detection
                     </h3>
                     <p>
-                      The text is compared with every other submission. The number is the highest similarity found,
-                      so it points to the single closest match.
+                      The answer is compared with every other answer to the same assignment, looking for runs of four
+                      or more matching words (one may differ, so OCR slips don&apos;t hide copying). The number is the
+                      share of its phrases found in the closest match.
+                      Wording from the question paper, and phrases most of the class uses, are ignored, so answering
+                      the same question in similar words doesn&apos;t count.
                     </p>
                   </section>
                   <div className="review-explain__legend">
+                    <span className="review-explain__legend-label">AI</span>
                     <span className="hl hl--green">under 50% · low</span>
-                    <span className="hl">50–74% · medium</span>
+                    <span className="hl">50–74% · worth a look</span>
                     <span className="hl hl--pink">75%+ · flagged</span>
+                  </div>
+                  <div className="review-explain__legend">
+                    <span className="review-explain__legend-label">Duplicate</span>
+                    <span className="hl hl--green">under 20% · low</span>
+                    <span className="hl">20–34% · worth a look</span>
+                    <span className="hl hl--pink">35%+ (or 25%+ at 3× the class median) · flagged</span>
                   </div>
                   <p className="review-explain__note">
                     Scores are signals, not verdicts. Read the transcription before acting on a high score.

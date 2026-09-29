@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 import SlidingIndicator from "../AIGeneratedContent/AIGeneratedContent";
 import Stamp from "../Stamp/Stamp";
-import { aiScoreOf, cropFilename, displayNameOf, needsReview } from "../../utils/submission";
+import { aiScoreOf, cropFilename, displayNameOf, needsReview, userNameOf } from "../../utils/submission";
 import "./StudentRecord.css";
 
 const COLUMNS = [
@@ -50,7 +50,7 @@ const SkeletonRows = () =>
     </tr>
   ));
 
-const StudentRecord = ({ data, loading, hasFilters, onResetFilters }) => {
+const StudentRecord = ({ data, loading, hasFilters, onResetFilters, onCompare }) => {
   const [sort, setSort] = useState({ key: null, direction: "asc" });
 
   const rows = useMemo(() => {
@@ -141,13 +141,13 @@ const StudentRecord = ({ data, loading, hasFilters, onResetFilters }) => {
                   transition={{ duration: 0.35, delay: rowDelay, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <td data-label="Student">
-                    <Link to={`/OcrResult/${item.uploaded_by.user_id}`} className="ledger__student">
+                    <Link to={`/OcrResult/${item.id}`} className="ledger__student">
                       <span className="ledger__initials" aria-hidden="true">
                         {initialsOf(name)}
                       </span>
                       <span className="ledger__student-text">
                         <strong>{name}</strong>
-                        {item.uploaded_by.email && <span>{item.uploaded_by.email}</span>}
+                        {item.uploaded_by?.email && <span>{item.uploaded_by.email}</span>}
                       </span>
                     </Link>
                   </td>
@@ -158,15 +158,30 @@ const StudentRecord = ({ data, loading, hasFilters, onResetFilters }) => {
                     {aiScore === undefined ? (
                       <span className="ledger__na">not scored</span>
                     ) : (
-                      <SlidingIndicator label={`AI detection for ${name}`} value={aiScore.toFixed(2)} delay={0.25 + rowDelay} />
+                      <div className="ledger__stack">
+                        <SlidingIndicator label={`AI detection for ${name}`} value={aiScore.toFixed(2)} delay={0.25 + rowDelay} />
+                        {item.ai_confidence === "low" && (
+                          <span className="ledger__caution" title={`Only ${item.word_count} words: too short for a reliable AI score`}>
+                            low confidence · {item.word_count} words
+                          </span>
+                        )}
+                      </div>
                     )}
                   </td>
                   <td data-label="Duplicate content">
-                    <div className="ledger__dup">
-                      <SlidingIndicator label={`Duplicate content for ${name}`} value={item.max_similarity} delay={0.35 + rowDelay} />
-                      {item.other_file_names?.length > 0 && (
-                        <span className="ledger__match" title="Most similar submission">
-                          ↳ closest: {item.other_file_names.map(cropFilename).join(", ")}
+                    <div className="ledger__stack">
+                      <SlidingIndicator
+                        label={`Duplicate content for ${name}`}
+                        value={item.max_similarity}
+                        tone={item.similarity_level}
+                        delay={0.35 + rowDelay}
+                      />
+                      {item.closest && (
+                        <span className="ledger__match">
+                          ↳ {userNameOf(item.closest.uploaded_by)} ·{" "}
+                          <button type="button" className="ledger__compare" onClick={() => onCompare(item)}>
+                            compare
+                          </button>
                         </span>
                       )}
                     </div>

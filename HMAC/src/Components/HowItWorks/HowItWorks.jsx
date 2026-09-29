@@ -1,15 +1,16 @@
-import { useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { motion } from "framer-motion";
+import Modal from "../Modal/Modal";
 import "./HowItWorks.css";
 
 const STEPS = [
-  { title: "Upload a PDF", text: "Students upload a scanned, handwritten assignment." },
-  { title: "Handwriting is read", text: "Each page is turned into an image and transcribed with OCR." },
+  { title: "Upload a PDF", text: "Students pick the assignment and upload a scanned, handwritten answer." },
+  { title: "Handwriting is read", text: "The first page is turned into an image and transcribed with OCR." },
   { title: "AI detection", text: "A DistilBERT classifier estimates how likely the text is AI-generated." },
-  { title: "Similarity check", text: "The text is compared with every other submission to find the closest match." },
-  { title: "Review", text: "Professors see every score in the Summary and can open the transcribed text." },
+  {
+    title: "Duplicate check",
+    text: "The answer is compared with the others for the same assignment, looking for shared 4-word phrases (one word may differ, for OCR slips). Phrases from the question paper, and ones most of the class uses, are ignored.",
+  },
+  { title: "Review", text: "Professors see every score in the Summary, and can compare the matching passages side by side." },
 ];
 
 const listVariants = {
@@ -21,83 +22,37 @@ const itemVariants = {
   animate: { opacity: 1, x: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
 };
 
-const HowItWorks = ({ open, onClose }) => {
-  const closeRef = useRef(null);
+const HowItWorks = ({ open, onClose }) => (
+  <Modal
+    open={open}
+    onClose={onClose}
+    labelledBy="how-it-works-title"
+    eyebrow={
+      <>
+        <span className="eyebrow__index">?</span>
+        How to use
+      </>
+    }
+    title="How HMAC checks an assignment"
+  >
+    <motion.ol className="steps" variants={listVariants} initial="initial" animate="animate">
+      {STEPS.map(({ title, text }, index) => (
+        <motion.li key={title} className="steps__item" variants={itemVariants}>
+          <span className="steps__number">{index + 1}</span>
+          <span className="steps__text">
+            <strong>{title}</strong>
+            <span>{text}</span>
+          </span>
+        </motion.li>
+      ))}
+    </motion.ol>
 
-  useEffect(() => {
-    if (!open) return undefined;
-    const previouslyFocused = document.activeElement;
-    const onKey = (e) => e.key === "Escape" && onClose();
-    const { overflow } = document.body.style;
-
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
-
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = overflow;
-      previouslyFocused?.focus?.();
-    };
-  }, [open, onClose]);
-
-  return createPortal(
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          className="modal__backdrop"
-          onClick={onClose}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <motion.div
-            className="sheet sheet--taped modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="how-it-works-title"
-            onClick={(e) => e.stopPropagation()}
-            initial={{ opacity: 0, y: 40, rotate: -3 }}
-            animate={{ opacity: 1, y: 0, rotate: -0.6 }}
-            exit={{ opacity: 0, y: 30, rotate: 2 }}
-            transition={{ type: "spring", stiffness: 300, damping: 26 }}
-          >
-            <header className="modal__header">
-              <div>
-                <span className="eyebrow">
-                  <span className="eyebrow__index">?</span>
-                  How to use
-                </span>
-                <h2 id="how-it-works-title">How HMAC checks an assignment</h2>
-              </div>
-              <button ref={closeRef} type="button" className="btn btn-ghost btn-icon" onClick={onClose} aria-label="Close">
-                <X size={20} />
-              </button>
-            </header>
-
-            <motion.ol className="steps" variants={listVariants} initial="initial" animate="animate">
-              {STEPS.map(({ title, text }, index) => (
-                <motion.li key={title} className="steps__item" variants={itemVariants}>
-                  <span className="steps__number">{index + 1}</span>
-                  <span className="steps__text">
-                    <strong>{title}</strong>
-                    <span>{text}</span>
-                  </span>
-                </motion.li>
-              ))}
-            </motion.ol>
-
-            <footer className="modal__legend">
-              <span className="modal__swatch modal__swatch--low">under 50% · low</span>
-              <span className="modal__swatch modal__swatch--medium">50–74% · medium</span>
-              <span className="modal__swatch modal__swatch--high">75%+ · flagged</span>
-            </footer>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>,
-    document.body
-  );
-};
+    <footer className="modal__legend">
+      <span className="modal__swatch modal__swatch--low">low</span>
+      <span className="modal__swatch modal__swatch--medium">worth a look</span>
+      <span className="modal__swatch modal__swatch--high">flagged</span>
+    </footer>
+  </Modal>
+);
 
 export default HowItWorks;

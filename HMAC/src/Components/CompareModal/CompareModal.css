@@ -1,0 +1,129 @@
+.modal.compare {
+  max-width: 1040px;
+}
+
+.compare__loading,
+.compare__empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0 12px;
+  color: var(--ink-muted);
+}
+
+.compare__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.compare__tab {
+  height: 32px;
+  padding: 0 12px;
+  border: 1.5px solid var(--ink-line);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+
+.compare__tab:hover {
+  color: var(--ink);
+}
+
+.compare__tab.is-active {
+  border-color: var(--ink-border);
+  background: var(--paper-muted);
+  color: var(--ink);
+}
+
+.compare__summary {
+  margin-bottom: 18px;
+  font-size: 16px;
+}
+
+.compare__summary strong {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--red);
+}
+
+.compare__columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.compare__column {
+  min-width: 0;
+  border: 1.5px solid var(--ink-line);
+  border-radius: var(--radius);
+  background-color: var(--paper-sheet);
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, var(--rule) 31px, var(--rule) 32px);
+  background-position: 0 44px;
+}
+
+.compare__column header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1.5px dashed var(--ink-line);
+}
+
+.compare__column header strong {
+  font-size: 14.5px;
+}
+
+.compare__column header span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-subtle);
+}
+
+.compare__text {
+  max-height: 46vh;
+  overflow: auto;
+  padding: 8px 16px 16px;
+  font-size: 15px;
+  line-height: 32px;
+}
+
+/* Shared passages, swept in with a pink highlighter */
+.compare__text mark {
+  padding: 0 1px;
+  color: inherit;
+  background-color: transparent;
+  background-image: linear-gradient(100deg, transparent 0.5%, var(--hl-pink) 2%, var(--hl-pink) 97%, transparent 99.5%);
+  background-repeat: no-repeat;
+  background-position: 0 60%;
+  mix-blend-mode: var(--hl-blend);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.compare__note {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1.5px dashed var(--ink-line);
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .compare__columns {
+    grid-template-columns: 1fr;
+  }
+
+  .compare__text {
+    max-height: 32vh;
+  }
+}

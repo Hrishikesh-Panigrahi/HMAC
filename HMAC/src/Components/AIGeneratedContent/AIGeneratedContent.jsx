@@ -4,9 +4,10 @@ import { clampScore, scoreTone } from "../../utils/score";
 import "./AIGeneratedContent.css";
 
 // Score as a highlighter stroke swiped across a dotted baseline.
-const SlidingIndicator = ({ value, label = "Score", delay = 0 }) => {
+// `tone` (low / medium / high) overrides the default 50/75 thresholds.
+const SlidingIndicator = ({ value, label = "Score", delay = 0, tone: toneOverride }) => {
   const score = clampScore(value);
-  const tone = scoreTone(score);
+  const tone = toneOverride ?? scoreTone(score);
 
   return (
     <div

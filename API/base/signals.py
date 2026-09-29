@@ -8,13 +8,11 @@ from pdf2image import convert_from_path
 
 from .models import FileModel, FileImage, AIDetection, TxtFileModel, FileComparisonModel, User, FileModel, TxtFileModel, OcrResult
 from .helper import roboflowHelperFunc, ocrHelperFunc, makeDir
-from .comparison import compare_file_similarity
+from .similarity import recompute_assignment
 
 import torch
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import gensim as gensim
-
-import concurrent.futures
 
 COVER_PAGE_DIRECTORY = 'coverdirectory/'
 COVER_PAGE_FORMAT = 'jpg'
@@ -158,7 +156,8 @@ def create_ai_detection(sender, instance, created, **kwargs):
 
         newText = filtered_sentence
 
-        inputs = tokenizer(ogtext, return_tensors="pt")
+        # The model reads at most 512 tokens; longer answers are cut there instead of crashing.
+        inputs = tokenizer(ogtext, return_tensors="pt", truncation=True, max_length=512)
 
         input_ids = inputs["input_ids"]
         attention_mask = inputs["attention_mask"]
@@ -195,6 +194,7 @@ def create_ai_detection(sender, instance, created, **kwargs):
 
         ocr_result = OcrResult(
             uploaded_by=instance.uploaded_by,
+            submission=instance.pdfFile,
             filename=instance.filename,
             ocr_results=text,
         )
@@ -207,6 +207,7 @@ def create_ai_detection(sender, instance, created, **kwargs):
 
         txt_file_model = TxtFileModel(
             uploaded_by=instance.uploaded_by,
+            submission=instance.pdfFile,
             filename=txt_file_name,
             description=instance.description,
             file=txt_file,
@@ -227,50 +228,9 @@ def GrammarChecker(text):
     return newtext
 
 
-def compare_uploaded_file_with_database(uploaded_file_content, uploaded_file_data, file_model_list):
-    comparisons = []  # To store comparison results before saving
-
-    # Some parallel processing magic which I have no clue of
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        future_to_filename = {
-            executor.submit(compare_file_similarity, uploaded_file_content, file_model): file_model.filename
-            for file_model in file_model_list
-        }
-        for future in concurrent.futures.as_completed(future_to_filename):
-            filename = future_to_filename[future]
-            try:
-                result = future.result()
-                if result[1] is not None:
-                    print(
-                        f"Similarity between uploaded file and '{filename}': {result[1] * 100:.2f}")
-                    # Create a dictionary to store comparison data
-                    comparison_data = {
-                        'uploaded_file': uploaded_file_data,
-                        'other_file': file_model_list.get(filename=filename),
-                        'similarity_result': result[1],
-                    }
-                    comparisons.append(comparison_data)
-                else:
-                    print(
-                        f"Error processing '{filename}': Unable to calculate similarity.")
-            except Exception as exc:
-                print(f"Error processing '{filename}': {exc}")
-
-    FileComparisonModel.objects.bulk_create(
-        [FileComparisonModel(**data) for data in comparisons])
-
-
 @receiver(post_save, sender=TxtFileModel)
 def calculate_similarity_on_upload(sender, instance, created, **kwargs):
     if created:
-        # Get the content of the uploaded file using the newly defined method
-        uploaded_file_content = instance.read_file_content()
-
-        # Get all other files from the database
-        other_files = TxtFileModel.objects.exclude(pk=instance.pk)
-
-        uploaded_file_data = instance
-
-        # Trigger similarity calculation for the uploaded file with all other files
-        compare_uploaded_file_with_database(
-            uploaded_file_content, uploaded_file_data, other_files)
+        # Re-score the whole assignment: which phrases are "common" depends on every submission.
+        assignment_id = instance.submission.assignment_id if instance.submission_id else None
+        recompute_assignment(assignment_id)

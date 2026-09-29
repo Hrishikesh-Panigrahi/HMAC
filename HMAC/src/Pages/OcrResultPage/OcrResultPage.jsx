@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Check, Copy, RefreshCw } from "lucide-react";
+import { ArrowLeft, Check, Copy, LogIn, RefreshCw } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import PageTransition from "../../Components/PageTransition/PageTransition";
 import Sheet from "../../Components/Sheet/Sheet";
+import { API_BASE, authHeaders, isAuthError } from "../../utils/api";
 import "./OcrResult.css";
 
 // Word-by-word "writing" reveal is only used for texts short enough that it stays quick.
@@ -24,13 +25,14 @@ const wordVariants = {
 const OcrResultPage = () => {
   const { id } = useParams();
   const [ocrData, setOcrData] = useState(null);
-  const [status, setStatus] = useState("loading"); // loading | ready | error
+  const [status, setStatus] = useState("loading"); // loading | ready | error | unauthorized
   const [copied, setCopied] = useState(false);
 
   const fetchOcrResult = useCallback(async () => {
     setStatus("loading");
     try {
-      const response = await axios.get(`http://localhost:8000/api/v1/results/${id}`);
+      // `id` is the submission's row in the summary; transcriptions are professor-only.
+      const response = await axios.get(`${API_BASE}/results/${id}`, { headers: authHeaders() });
       if (response.status === 200) {
         setOcrData(response.data);
         setStatus("ready");
@@ -39,6 +41,10 @@ const OcrResultPage = () => {
         setStatus("error");
       }
     } catch (error) {
+      if (isAuthError(error)) {
+        setStatus("unauthorized");
+        return;
+      }
       console.error("Network error:", error);
       setStatus("error");
     }
@@ -97,11 +103,29 @@ const OcrResultPage = () => {
         >
           <span className="ocr__error-note">no transcription here…</span>
           <h2>Couldn&apos;t load this OCR result</h2>
-          <p>The server didn&apos;t return a transcription for this student. It may not have been processed yet.</p>
+          <p>The server didn&apos;t return a transcription for this submission. It may not have been processed yet.</p>
           <button type="button" className="btn btn-primary" onClick={fetchOcrResult}>
             <RefreshCw size={16} />
             Try again
           </button>
+        </Sheet>
+      )}
+
+      {status === "unauthorized" && (
+        <Sheet
+          taped
+          className="ocr__error"
+          role="alert"
+          initial={{ opacity: 0, y: 14, rotate: -1 }}
+          animate={{ opacity: 1, y: 0, rotate: -0.4 }}
+        >
+          <span className="ocr__error-note">professors only</span>
+          <h2>Sign in to read transcriptions</h2>
+          <p>Transcriptions are only available to professor accounts. If you were signed in, your session may have expired.</p>
+          <Link to="/" className="btn btn-primary">
+            <LogIn size={16} />
+            Sign in
+          </Link>
         </Sheet>
       )}
 

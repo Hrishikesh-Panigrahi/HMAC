@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from base.models import User
-from .models import FileModel, FileComparisonModel, AIDetection, OcrResult
+from .models import Assignment, FileModel, FileComparisonModel, AIDetection, OcrResult
 from django.contrib.auth import authenticate
 
 class UserRegisterSerializer(ModelSerializer):
@@ -69,7 +69,16 @@ class AIDetectionSerializer(serializers.ModelSerializer):
 class FileModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileModel
-        fields = ['id', 'uploaded_by', 'filename', 'description', 'file']
+        fields = ['id', 'uploaded_by', 'assignment', 'filename', 'description', 'file']
+        # Set from the logged-in user, never from the request body.
+        read_only_fields = ['uploaded_by']
+
+class AssignmentSerializer(serializers.ModelSerializer):
+    submission_count = serializers.IntegerField(source='submissions.count', read_only=True)
+
+    class Meta:
+        model = Assignment
+        fields = ['id', 'title', 'reference_text', 'created_on', 'submission_count']
 
 class OcrResultSerializer(serializers.ModelSerializer):
     class Meta:
@@ -78,5 +87,5 @@ class OcrResultSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['uploaded_by'] = instance.uploaded_by.email  
+        representation['uploaded_by'] = instance.uploaded_by.email if instance.uploaded_by else None
         return representation
