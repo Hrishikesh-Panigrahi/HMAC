@@ -1,4 +1,5 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -38,9 +39,9 @@ def upload_file(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAdminUser])  # staff only; send the login JWT as a Bearer token
 def list_files_for_teacher(request):
     serializer = None
-    # if request.user.is_staff:   #isko baadmai karte
     files = TxtFileModel.objects.all()
     max_similarities = {}
     other_file_info = {}

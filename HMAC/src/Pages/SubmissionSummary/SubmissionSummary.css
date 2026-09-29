@@ -40,6 +40,10 @@
   font-variant-numeric: tabular-nums;
 }
 
+.stat__value--empty {
+  color: var(--ink-subtle);
+}
+
 .stat__skeleton {
   width: 90px;
   height: 48px;

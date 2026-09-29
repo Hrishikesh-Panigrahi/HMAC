@@ -19,9 +19,11 @@ class UserRegisterSerializer(ModelSerializer):
         return user
     
 class UserSerializer(ModelSerializer):
+    # Nested in API responses, so list fields explicitly: never expose the
+    # password hash or auth flags (is_staff, is_superuser, permissions, ...).
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['user_id', 'username', 'email', 'full_name']
 
 class FileSerializer(ModelSerializer):
     uploaded_by = UserSerializer()

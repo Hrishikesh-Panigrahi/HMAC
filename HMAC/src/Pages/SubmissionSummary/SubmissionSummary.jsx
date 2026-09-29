@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { RefreshCw, Search, X } from "lucide-react";
+import { LogIn, RefreshCw, Search, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import PageTransition from "../../Components/PageTransition/PageTransition";
 import PageHeader from "../../Components/PageHeader/PageHeader";
@@ -25,14 +26,18 @@ const average = (values) => (values.length ? values.reduce((sum, v) => sum + v, 
 
 const SubmissionSummary = () => {
   const [data, setData] = useState([]);
-  const [status, setStatus] = useState("loading"); // loading | ready | error
+  const [status, setStatus] = useState("loading"); // loading | ready | error | unauthorized
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
 
   const fetchStudentRecords = useCallback(async () => {
     setStatus("loading");
     try {
-      const response = await axios.get("http://localhost:8000/api/v1/teacher/files/");
+      // The endpoint is staff-only; authenticate with the JWT saved at login.
+      const token = localStorage.getItem("access_token");
+      const response = await axios.get("http://localhost:8000/api/v1/teacher/files/", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       if (response.status === 200) {
         setData(response.data.file_data ?? []);
         setStatus("ready");
@@ -41,6 +46,11 @@ const SubmissionSummary = () => {
         setStatus("error");
       }
     } catch (error) {
+      const code = error.response?.status;
+      if (code === 401 || code === 403) {
+        setStatus("unauthorized");
+        return;
+      }
       console.error("Network error:", error);
       setStatus("error");
     }
@@ -106,11 +116,11 @@ const SubmissionSummary = () => {
             transition={{ type: "spring", stiffness: 220, damping: 20, delay: 0.06 * index }}
           >
             <span className="stat__label">{label}</span>
-            {status === "loading" ? (
-              <span className="skeleton stat__skeleton" />
-            ) : (
-              <CountUp className="stat__value" value={status === "ready" ? value : 0} decimals={decimals} suffix={suffix} delay={0.15 + 0.1 * index} />
+            {status === "loading" && <span className="skeleton stat__skeleton" />}
+            {status === "ready" && (
+              <CountUp className="stat__value" value={value} decimals={decimals} suffix={suffix} delay={0.15 + 0.1 * index} />
             )}
+            {(status === "error" || status === "unauthorized") && <span className="stat__value stat__value--empty">—</span>}
             {alert && status === "ready" && flaggedCount > 0 && (
               <Annotation className="stat__note" rotate={-7} delay={1.2}>
                 check these first
@@ -120,7 +130,23 @@ const SubmissionSummary = () => {
         ))}
       </section>
 
-      {status === "error" ? (
+      {status === "unauthorized" ? (
+        <Sheet
+          taped
+          className="summary-error"
+          initial={{ opacity: 0, y: 16, rotate: -1 }}
+          animate={{ opacity: 1, y: 0, rotate: -0.5 }}
+          role="alert"
+        >
+          <span className="summary-error__note">professors only</span>
+          <h2>Sign in to see submissions</h2>
+          <p>The summary is only available to professor accounts. If you were signed in, your session may have expired.</p>
+          <Link to="/" className="btn btn-primary">
+            <LogIn size={16} />
+            Sign in
+          </Link>
+        </Sheet>
+      ) : status === "error" ? (
         <Sheet
           taped
           className="summary-error"
