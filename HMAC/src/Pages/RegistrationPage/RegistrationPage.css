@@ -1,16 +1,57 @@
-.registration-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #502abd;
+.register__password {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.registration-box {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    width: 300px;
-    text-align: center;
+/* Strength shown as four tally marks */
+.strength {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.strength__bars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  flex: 1;
+}
+
+.strength__bars span {
+  height: 6px;
+  background: var(--paper-muted);
+  border-radius: 2px 5px 3px 6px / 4px 2px 5px 3px;
+  transform: skewX(-12deg);
+  transition: background-color 0.3s var(--ease-out), transform 0.3s var(--ease-spring);
+}
+
+.strength__bars span.is-on {
+  transform: skewX(-12deg) scaleY(1.4);
+}
+
+.strength--1 .is-on {
+  background: var(--red);
+}
+
+.strength--2 .is-on {
+  background: var(--amber);
+}
+
+.strength--3 .is-on {
+  background: #7aa33a;
+}
+
+.strength--4 .is-on {
+  background: var(--green);
+}
+
+.strength__label {
+  min-width: 70px;
+  text-align: right;
+  font-family: var(--font-hand);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink-muted);
 }

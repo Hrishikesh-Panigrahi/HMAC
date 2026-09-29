@@ -1,0 +1,63 @@
+.stamp {
+  display: inline-block;
+  padding: 3px;
+  border: 2.5px solid currentColor;
+  border-radius: 5px;
+  color: var(--stamp-color);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  mix-blend-mode: var(--hl-blend);
+  -webkit-mask-image: var(--stamp-mask);
+  mask-image: var(--stamp-mask);
+  -webkit-mask-size: 120px 60px;
+  mask-size: 120px 60px;
+  user-select: none;
+}
+
+.stamp__inner {
+  display: block;
+  padding: 5px 9px 4px 11px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+}
+
+.stamp--sm {
+  font-size: 10.5px;
+  border-width: 2px;
+  padding: 2px;
+}
+
+.stamp--sm .stamp__inner {
+  padding: 3px 6px 2px 8px;
+}
+
+.stamp--md {
+  font-size: 13px;
+}
+
+.stamp--lg {
+  font-size: 22px;
+  border-width: 3.5px;
+  padding: 4px;
+}
+
+.stamp--lg .stamp__inner {
+  padding: 8px 14px 6px 18px;
+  border-width: 1.5px;
+}
+
+.stamp--red {
+  --stamp-color: var(--red);
+}
+
+.stamp--blue {
+  --stamp-color: var(--blue);
+}
+
+.stamp--green {
+  --stamp-color: var(--green);
+}

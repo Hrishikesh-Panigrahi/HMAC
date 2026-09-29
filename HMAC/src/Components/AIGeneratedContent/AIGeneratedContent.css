@@ -1,44 +1,59 @@
-.sliding-indicator-container {
-    display: flex;
-    flex-direction: column;
-    width: 450px;
+.meter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 150px;
 }
 
-.sliding-indicator-container .text {
-    font-weight: 300;
-    font-size: 16px;
-    display: inline-block;
-    width: 250px;
-    background: none;
-    color: black;
+.meter__track {
+  position: relative;
+  flex: 1;
+  height: 16px;
 }
 
-.sliding-indicator-container .progress-bar {
-    margin-left: 25%;
-    /* width: 75%; */
-    max-width: 250px;
-    background-color: #ccc;
-    border-radius: var(--br-21xl);
-    overflow: hidden;
-    position: relative;
+/* Dotted baseline the stroke is drawn over */
+.meter__track::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 1.5px dotted var(--ink-subtle);
+  opacity: 0.6;
 }
 
-.sliding-indicator-container .progress {
-    height: 20px;
-    display: flex;
-    align-items: center;
-    width: 0;
-    transition: width 2s ease;
+.meter__stroke {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--meter-hl);
+  mix-blend-mode: var(--hl-blend);
+  /* Uneven edges, like a marker swipe */
+  border-radius: 3px 8px 5px 9px / 7px 4px 8px 3px;
+  transform: skewX(-12deg);
+  transform-origin: left center;
 }
 
-.sliding-indicator-container .progress.animate {
-    width: 100%;
+.meter__value {
+  min-width: 54px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--meter-ink);
 }
 
-.sliding-indicator-container .percent-text {
-    color: white;
-    text-align: center;
-    margin-left: 100px;
-    font-size: medium;
+.meter--low {
+  --meter-hl: var(--hl-green);
+  --meter-ink: var(--green);
 }
 
+.meter--medium {
+  --meter-hl: var(--hl-orange);
+  --meter-ink: var(--amber);
+}
+
+.meter--high {
+  --meter-hl: var(--hl-pink);
+  --meter-ink: var(--red);
+}

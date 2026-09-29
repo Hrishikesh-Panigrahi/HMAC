@@ -1,0 +1,75 @@
+.grade {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.grade__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 170px;
+  height: 124px;
+  margin-bottom: 8px;
+}
+
+.grade__circle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.grade__circle path {
+  fill: none;
+  stroke: var(--grade-ink);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+}
+
+.grade__value {
+  position: relative;
+  font-family: var(--font-serif);
+  font-size: 50px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.grade__label {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.grade__caption {
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.grade__remark {
+  margin-top: 4px;
+  font-family: var(--font-hand);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--grade-ink);
+}
+
+.grade--low {
+  --grade-ink: var(--green);
+}
+
+.grade--medium {
+  --grade-ink: var(--amber);
+}
+
+.grade--high {
+  --grade-ink: var(--red);
+}

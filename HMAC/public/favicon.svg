@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <defs>
+    <mask id="cut">
+      <rect width="48" height="48" fill="#fff"/>
+      <circle cx="24" cy="21" r="3.2" fill="#000"/>
+      <path d="M24 24.5V40" stroke="#000" stroke-width="1.9" stroke-linecap="round"/>
+      <path d="M15 12h18" stroke="#000" stroke-width="1.7"/>
+    </mask>
+  </defs>
+  <rect x="1.5" y="1.5" width="45" height="45" rx="9" fill="#fbf8f1" stroke="#1d1f33" stroke-width="3"/>
+  <path d="M15 6h18v10c0 7-3.5 12.5-9 25-5.5-12.5-9-18-9-25z" fill="#1d1f33" mask="url(#cut)"/>
+  <path d="M8 30h32" stroke="#cf3a28" stroke-width="2.6" stroke-linecap="round"/>
+</svg>

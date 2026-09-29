@@ -1,0 +1,330 @@
+.auth {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  min-height: 100vh;
+}
+
+.auth__theme {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 5;
+}
+
+/* ---------- Hero (left) ---------- */
+
+.auth__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 40px 48px 48px calc(var(--margin-x) + 48px);
+  overflow: hidden;
+}
+
+.auth__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth__headline {
+  font-family: var(--font-serif);
+  font-size: clamp(48px, 5.4vw, 76px);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.auth__headline-accent {
+  position: relative;
+  display: inline-block;
+  font-style: italic;
+  color: var(--red);
+}
+
+.auth__lede {
+  max-width: 470px;
+  color: var(--ink-muted);
+  font-size: 16.5px;
+}
+
+.auth__steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auth__steps li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth__steps li span {
+  color: var(--red);
+}
+
+.auth__steps li + li::before {
+  content: "→";
+  margin-right: 12px;
+  color: var(--ink-subtle);
+}
+
+/* ---------- Graded paper illustration ---------- */
+
+.graded {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 460px;
+  height: 236px;
+  margin: auto 0 10px 12px;
+}
+
+.graded__under,
+.graded__sheet {
+  position: absolute;
+  inset: 0;
+  box-shadow: var(--shadow-soft), 3px 3px 0 var(--shadow-ink);
+}
+
+.graded__under {
+  background-color: var(--paper-muted);
+}
+
+.graded__sheet {
+  padding: 0 24px 0 72px;
+  overflow: hidden;
+}
+
+.graded__meta {
+  display: flex;
+  justify-content: space-between;
+  height: 34px;
+  padding-top: 11px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-subtle);
+}
+
+.graded__line {
+  position: relative;
+  height: 34px;
+}
+
+.graded__ink {
+  position: relative;
+  display: inline-block;
+  /* Right padding keeps the handwriting's overhanging strokes inside the reveal clip */
+  padding: 5px 8px 0 0;
+  font-family: var(--font-hand);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 28px;
+  white-space: nowrap;
+  color: var(--blue);
+}
+
+.graded__highlight {
+  position: absolute;
+  left: -4px;
+  top: 10px;
+  width: 62%;
+  height: 20px;
+  background: var(--hl-yellow);
+  mix-blend-mode: var(--hl-blend);
+  border-radius: 3px 10px 4px 12px / 8px 3px 9px 4px;
+  transform-origin: left center;
+}
+
+.graded__grade {
+  position: absolute;
+  top: 38px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 76px;
+  transform: rotate(6deg);
+}
+
+.graded__grade svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.graded__grade path {
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.graded__score {
+  font-family: var(--font-hand);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--red);
+}
+
+.graded__note {
+  position: absolute;
+  bottom: -20px;
+  right: 6px;
+  font-family: var(--font-hand);
+  font-size: 19px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--red);
+}
+
+.graded__stamp {
+  position: absolute;
+  right: 26px;
+  bottom: 22px;
+}
+
+/* ---------- Form panel (right) ---------- */
+
+.auth__panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 32px;
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 430px;
+  padding: 40px 36px 32px;
+  box-shadow: var(--shadow-lift);
+}
+
+.auth__mobile-brand {
+  display: none;
+  margin-bottom: 24px;
+}
+
+.auth__card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.auth__card-header h2 {
+  font-family: var(--font-serif);
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.auth__card-header p {
+  color: var(--ink-muted);
+}
+
+.auth__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth__form .btn {
+  margin-top: 18px;
+}
+
+.auth__alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--red);
+  border-radius: var(--radius);
+  background: var(--red-soft);
+  color: var(--red);
+  font-size: 13.5px;
+  font-weight: 500;
+  overflow: hidden;
+}
+
+.auth__alert svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.auth__footer {
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1.5px dashed var(--ink-line);
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+
+.auth__footer a {
+  font-weight: 600;
+}
+
+/* Short screens: tighten the hero so the illustration still fits */
+@media (max-height: 820px) and (min-width: 961px) {
+  .auth__hero {
+    gap: 22px;
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  .auth__copy {
+    gap: 12px;
+  }
+
+  .auth__headline {
+    font-size: clamp(44px, 4.6vw, 60px);
+  }
+
+  .auth__lede {
+    font-size: 15px;
+  }
+}
+
+@media (max-height: 640px) and (min-width: 961px) {
+  .graded {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .auth {
+    grid-template-columns: 1fr;
+  }
+
+  .auth__hero {
+    display: none;
+  }
+
+  .auth__mobile-brand {
+    display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth__panel {
+    padding: 72px 16px 32px;
+  }
+
+  .auth__card {
+    padding: 32px 22px 26px;
+  }
+}

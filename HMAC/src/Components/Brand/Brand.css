@@ -1,0 +1,91 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+}
+
+.brand__name {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.brand__name::after {
+  content: ".";
+  color: var(--red);
+}
+
+.brand--compact {
+  gap: 8px;
+}
+
+.brand--compact .brand__name {
+  font-size: 26px;
+}
+
+.logo-mark {
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.logo-mark__nib {
+  fill: var(--ink);
+  transition: fill 0.3s var(--ease-out);
+}
+
+.logo-mark__line,
+.logo-mark__glow {
+  fill: none;
+  stroke: var(--red);
+  stroke-linecap: round;
+}
+
+.logo-mark__line {
+  stroke-width: 2.6;
+}
+
+.logo-mark__glow {
+  stroke-width: 7;
+  opacity: 0.18;
+}
+
+/* The scan line sweeps the nib once on load and again on hover */
+.logo-mark__scan {
+  animation: logo-scan 1.6s 0.3s var(--ease-out) both;
+}
+
+.brand:hover .logo-mark__scan,
+a:hover .logo-mark__scan {
+  animation: logo-scan-loop 1.8s ease-in-out infinite;
+}
+
+@keyframes logo-scan {
+  0% {
+    transform: translateY(-22px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes logo-scan-loop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(-20px);
+  }
+  70% {
+    transform: translateY(8px);
+  }
+}

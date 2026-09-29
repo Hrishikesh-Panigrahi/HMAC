@@ -1,106 +1,218 @@
-.Professor-Section {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
+.review-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 32px;
+  align-items: stretch;
 }
 
-.teacher-view-Left-container {
-    position: absolute;
-    top: 8rem;
-    left: 250px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* ---------- Document on a clipboard ---------- */
+
+.review-doc {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-top: 14px;
 }
 
-.teacher-view {
-    border-radius: 15px;
-    background-color: rgba(162, 159, 159, 0.15);
-    border: 1px solid var(--color-black);
-    box-sizing: border-box;
-    width: 400px;
-    height: 500px;
+.review-doc .sheet__body {
+  flex: 1;
 }
 
-
-.button-container {
-    position: relative;
-    top: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.review-doc__clip {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  z-index: 2;
+  width: 110px;
+  height: 26px;
+  transform: translateX(-50%);
+  border: 1.5px solid var(--ink-border);
+  border-radius: 6px 6px 10px 10px;
+  background: linear-gradient(to bottom, #c9cbd4, #9ea1ad);
+  box-shadow: 2px 2px 0 var(--shadow-ink), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-.custom-button {
-    padding: 10px 20px;
-    margin: 0 10px;
-    background-color: #3016ce;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    width: 175px;
-    height: 38px;
-    border-radius: var(--br-21xl);
+.review-doc__clip::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 30px;
+  height: 8px;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  background: var(--paper-deep);
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.custom-button:hover {
-    background-color: #40179d;
+.review-doc__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13.5px;
 }
 
-.teacher-view-Right-container {
-    position: absolute;
-    top: 8rem;
-    right: 250px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* ---------- Folder with index tabs ---------- */
+
+.review-folder {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
-.teacher-analysis {
-    background-color: rgba(162, 159, 159, 0.19);
-    width: 400px;
-    height: 500px;
+.folder-tabs {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 6px;
+  padding-left: 16px;
 }
 
-.name-title,
-.desc-title {
-    position: absolute;
-    top: 0;
-    left: 20px;
-    font-weight: 300;
-    display: inline-block;
+.folder-tab {
+  position: relative;
+  height: 40px;
+  padding: 0 20px;
+  margin-bottom: -1.5px;
+  border: 1.5px solid var(--ink-border);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: var(--paper-muted);
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transform: translateY(4px);
+  transition: transform 0.2s var(--ease-out), background-color 0.2s, color 0.2s;
 }
 
-.desc-title {
-    top: 100px;
+.folder-tab:hover {
+  color: var(--ink);
+  transform: translateY(1px);
 }
 
-.pdf-name-field,
-.pdf-desc-field {
-    border-radius: var(--br-21xl);
-    background-color: white;
-    width: 350px;
-    height: 40px;
-    position: absolute;
-    top: 50px;
-    left: 20px;
+/* Active tab joins the sheet below it */
+.folder-tab.is-active {
+  z-index: 2;
+  height: 44px;
+  background-color: var(--paper-sheet);
+  background-image: var(--grain);
+  color: var(--ink);
+  transform: none;
 }
 
-.pdf-desc-field {
-    top: 150px;
-    height: 120px;
-    border-radius: 20px;
+.review-panel {
+  flex: 1;
+  padding: 26px;
+  overflow: hidden;
 }
 
-.pdf-name-field span,
-.pdf-desc-field p {
-    position: absolute;
-    top: 10px;
-    left: 15px;
-    font-weight: 300;
-    display: inline-block;
+/* ---------- Result tab ---------- */
 
+.review-result {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.review-meta {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+}
+
+.review-meta div {
+  padding-bottom: 12px;
+  border-bottom: 1.5px dotted var(--ink-line);
+}
+
+.review-meta dt {
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-subtle);
+}
+
+.review-meta dd {
+  margin: 0;
+  color: var(--ink);
+}
+
+.review-scores {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding-top: 8px;
+}
+
+/* ---------- Explanation tab ---------- */
+
+.review-explain {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.review-explain h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 400;
+}
+
+.review-explain__num {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 28px;
+  border: 2px solid var(--red);
+  border-radius: 55% 45% 50% 50% / 50% 55% 45% 50%;
+  color: var(--red);
+  font-family: var(--font-hand);
+  font-size: 22px;
+  font-weight: 700;
+  transform: rotate(-6deg);
+}
+
+.review-explain p {
+  color: var(--ink-muted);
+}
+
+.review-explain__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.review-explain__note {
+  padding: 12px 16px;
+  border-left: 3px solid var(--red);
+  background: var(--red-soft);
+  color: var(--ink) !important;
+  font-family: var(--font-hand);
+  font-size: 21px;
+  line-height: 1.25;
+}
+
+@media (max-width: 960px) {
+  .review-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 460px) {
+  .review-scores {
+    grid-template-columns: 1fr;
+  }
 }

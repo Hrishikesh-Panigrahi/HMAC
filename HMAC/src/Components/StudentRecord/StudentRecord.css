@@ -1,46 +1,281 @@
-.table-container {
-  margin: 20px;
+/* A class register: mono headings over a double rule, hairline ruled rows. */
+
+.ledger {
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
-table {
-  max-width: 100%;
-  border-collapse: collapse;
+.ledger__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-th {
-  background-color: white;
-  color: #333;
-  padding: 6px;
+.ledger__table th {
+  padding: 14px 12px 10px;
+  border-bottom: 3px double var(--ink-border);
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-align: left;
-  margin-bottom: 10px;
-  text-align: center;
-  border-bottom: 10px solid #e6e6e6;
-  font-size: 24px;
-  font-weight: bold; 
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.even-row {
-  background-color: #ffffff;
+.ledger__table th:first-child,
+.ledger__table td:first-child {
+  padding-left: 22px;
 }
 
-.odd-row {
-  background-color: rgb(236, 236, 236);
+.ledger__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  margin: -3px -6px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  transition: color 0.2s, background-color 0.2s;
 }
 
-td {
-  padding: 6px;
-  border-bottom: 1px solid #ddd;
+.ledger__sort:hover {
+  color: var(--ink);
+  background: var(--paper-hover);
+}
+
+.ledger__sort.is-active {
+  color: var(--blue);
+}
+
+.ledger__table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: middle;
+}
+
+.ledger__row {
+  position: relative;
+  transition: background-color 0.2s var(--ease-out);
+}
+
+.ledger__row:hover:not(.ledger__row--skeleton) {
+  background: var(--paper-hover);
+}
+
+.ledger__row.is-flagged td:first-child {
+  box-shadow: inset 4px 0 0 var(--red);
+}
+
+.ledger__row:last-child td {
+  border-bottom: none;
+}
+
+/* ---------- Cells ---------- */
+
+.ledger__student {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 170px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.ledger__student:hover {
+  color: var(--ink);
+}
+
+.ledger__initials {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid var(--ink-border);
+  border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%;
+  background: var(--paper-muted);
+  font-family: var(--font-hand);
   font-size: 18px;
-  text-align: center;
-  border-left: 8px solid #ddd;
+  font-weight: 700;
+  transform: rotate(-4deg);
+  transition: transform 0.25s var(--ease-spring), background-color 0.2s;
 }
-/* 
-td:nth-child(3), 
-td:nth-child(4) {
-    max-width: 10% !important;  
-} */
 
-td:first-child {
-  border-left: none;
+.ledger__row:hover .ledger__initials {
+  transform: rotate(4deg) scale(1.06);
+  background: var(--hl-yellow);
+}
+
+.ledger__student-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ledger__student-text strong {
+  font-size: 14.5px;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s;
+}
+
+.ledger__student:hover strong {
+  text-decoration-color: var(--blue);
+}
+
+.ledger__student-text span {
+  color: var(--ink-subtle);
+  font-size: 12.5px;
+}
+
+.ledger__file {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--ink-muted);
+}
+
+.ledger__table td[data-label="AI detection"],
+.ledger__table td[data-label="Duplicate content"] {
+  min-width: 200px;
+}
+
+.ledger__dup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ledger__match {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-subtle);
+}
+
+.ledger__na {
+  color: var(--ink-subtle);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.ledger__ok {
+  font-family: var(--font-hand);
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--green);
+}
+
+/* ---------- Empty ---------- */
+
+.ledger__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.ledger__empty-note {
+  font-family: var(--font-hand);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--red);
+  transform: rotate(-3deg);
+}
+
+.ledger__empty h3 {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: 400;
+}
+
+.ledger__empty p {
+  margin-bottom: 10px;
+  color: var(--ink-muted);
+}
+
+/* ---------- Mobile: each row becomes an index card ---------- */
+
+@media (max-width: 760px) {
+  .ledger__table thead {
+    display: none;
+  }
+
+  .ledger__table,
+  .ledger__table tbody,
+  .ledger__table tr,
+  .ledger__table td {
+    display: block;
+    width: 100%;
+  }
+
+  .ledger__table tr {
+    padding: 14px 16px;
+    border-bottom: 1.5px dashed var(--ink-line);
+  }
+
+  .ledger__table td,
+  .ledger__table td:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 7px 0;
+    border: none;
+    box-shadow: none !important;
+  }
+
+  .ledger__table td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    color: var(--ink-subtle);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .ledger__table td[data-label="Student"]::before {
+    display: none;
+  }
+
+  .ledger__row.is-flagged {
+    box-shadow: inset 4px 0 0 var(--red);
+  }
+
+  .ledger__table td[data-label="AI detection"] .meter,
+  .ledger__table td[data-label="Duplicate content"] .meter {
+    flex: 1;
+    max-width: 220px;
+  }
+
+  .ledger__table td[data-label="AI detection"],
+  .ledger__table td[data-label="Duplicate content"] {
+    min-width: 0;
+  }
+
+  .ledger__student {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .ledger__dup {
+    flex: 1;
+    align-items: flex-end;
+    max-width: 260px;
+  }
+
+  .ledger__dup .meter {
+    width: 100%;
+  }
 }

@@ -1,191 +1,157 @@
-.header {
-    height: 25px;
-    background-color: #502abd;
-    position: fixed;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.5rem 2rem;
-    z-index: 100;
-    transition: all .4s ease-in-out;
-    box-shadow: 0 4px 6px rgba(237, 237, 237);
-    animation: fadeIn 0.5s ease-in-out;
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: var(--paper-sheet);
+  background-image: var(--grain);
+  border-bottom: 1.5px solid var(--ink-border);
+  transition: box-shadow 0.3s var(--ease-out), background-color 0.4s var(--ease-out);
 }
 
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 1;
-    }
+.nav--scrolled {
+  box-shadow: 0 3px 0 var(--ink-line), var(--shadow-soft);
 }
 
-.logoDiv img {
-    width: 50px;
-    margin-right: 20px;
+.nav__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: calc(var(--page-width) + 120px);
+  height: var(--nav-height);
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-
-.navbar {
-    display: flex;
-    align-items: center;
+.nav__brand {
+  flex-shrink: 0;
+  color: var(--ink);
+  text-decoration: none;
 }
 
-.logo {
-    max-width: 100px;
-    height: auto;
-    margin-left: 2vw;
+.nav__brand:hover {
+  color: var(--ink);
 }
 
-.menu {
-    list-style-type: none;
-    margin: 0 ;
-    padding: 0;
-    display: flex;
-    position: relative;
-    margin-left: 10vw;
-    text-align: center;
-    justify-content: center;
-    
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.listitem {
-    margin: 0 4px;
-    padding: .3rem 1rem;
+.nav__link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border: none;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 14.5px;
+  font-weight: 500;
+  text-decoration: none;
+  isolation: isolate;
+  transition: color 0.2s var(--ease-out);
 }
 
-
-.listitem a {
-    text-decoration: none;
-    color: #ffffff;
-    /* color for list items, chnage this, i tried: #CCCCCC, #FFD700, #F5F5F5, #FAEBD7 */
-    font-weight: bold;
+.nav__link:hover {
+  color: var(--ink);
 }
 
-.listitem:hover a {
-    color: #FFD700;
-    /* Change the text color on hover */
+.nav__link.is-active {
+  color: var(--ink);
+  font-weight: 600;
 }
 
-.signUp {
-    /* gap: .5rem; */
-    margin-right:80px ;
-
-    
+/* Active page is marked with a highlighter swipe that slides between links */
+.nav__highlight {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 50%;
+  z-index: -1;
+  height: 22px;
+  margin-top: -10px;
+  background: var(--hl-yellow);
+  mix-blend-mode: var(--hl-blend);
+  border-radius: 3px 9px 4px 10px / 8px 3px 9px 4px;
+  transform: skewX(-10deg) rotate(-1deg);
 }
 
-.text {
-    
-    padding: 3px 10px;
-    background-color: #280e6b;
-    color: white;
-    /* color for signup text, chnage this, i tried: #CCCCCC, #FFD700, #F5F5F5, #FAEBD7 */
-    padding: 10px 20px;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease-in-out;
-    
-
+.nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.signUp .text:hover {
-    color: #FFD700;
+.nav__menu-toggle {
+  display: none;
 }
 
+.nav__mobile {
+  display: none;
+}
 
+@media (max-width: 760px) {
+  .nav__bar {
+    padding: 0 12px 0 16px;
+  }
 
-
-
-
-
-
-
-
-
-/* Navbar.css */
-
-/* Hamburger menu styles */
-.hamburger {
+  .nav__links,
+  .nav__auth {
     display: none;
-    flex-direction: column;
-    cursor: pointer;
   }
-  
-  .bar {
-    width: 25px;
-    height: 3px;
-    margin: 3px 0;
-    background-color: #ffffff;
-    transition: all 0.3s ease;
-  }
-  
-  .bar.active {
-    background-color: #5b5b5b;
-  }
-  
-  /* Media query for responsive design */
-  @media (max-width: 768px) {
-    .logo{
-        margin-left: -5vw;
-    }
-    .header{
-        display: flex;
-        justify-content:flex-end;
-        
-        
-    }
-    .hamburger {
-        
-      display: flex;
-      margin: 0;
-      margin-top: -5px;
-      margin-left: 40vw;
-      margin-right: 5vw;
 
-    }
-  
-    .navbar {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      position: absolute;
-      width: 100%;
-      margin-left: -32px;
-      margin-top: 30vh;
-      background-color: #1f1f1fb1;
-      transition: all 0.3s ease;
-    }
-  
-    .navbar.open {
-      display: flex;
-      padding: 20px;
-      margin-top: 257px;
-      
-    }
-  
-    .menu{
-        flex-direction: column;
-margin: 0;
-margin-left: 8vw;     
-align-items: center;
-justify-content: center;  ; 
-    }
+  .nav__menu-toggle {
+    display: inline-flex;
   }
-  @media (max-width: 420px) {
-  
-    .hamburger {
-        
-        display: flex;
-        margin: 0;
-        margin-top: -5px;
-        margin-left: 20vw;
-        margin-right: 5vw;
-  
-      }
+
+  .nav__mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 12px 14px;
+    border-top: 1.5px dashed var(--ink-line);
+    transform-origin: top center;
+  }
+
+  .nav__mobile-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 48px;
+    padding: 0 10px;
+    border: none;
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 500;
+    text-align: left;
+    text-decoration: none;
+  }
+
+  .nav__mobile-link:hover {
+    background: var(--paper-hover);
+    color: var(--ink);
+  }
+
+  .nav__mobile-link.is-active {
+    font-weight: 600;
+    background: var(--hl-yellow);
+    mix-blend-mode: var(--hl-blend);
+  }
+
+  .nav__mobile-auth {
+    display: flex;
+    margin-top: 8px;
+  }
+
+  .nav__mobile-auth .btn {
+    width: 100%;
+  }
 }

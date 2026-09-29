@@ -1,0 +1,46 @@
+.annotation {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 4px;
+  font-family: var(--font-hand);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--note-color);
+  pointer-events: none;
+  user-select: none;
+}
+
+.annotation--red {
+  --note-color: var(--red);
+}
+
+.annotation--blue {
+  --note-color: var(--blue);
+}
+
+.annotation--green {
+  --note-color: var(--green);
+}
+
+.annotation__arrow {
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+.annotation__arrow--down {
+  width: 30px;
+  height: 34px;
+  margin-bottom: -26px;
+}
+
+.annotation__arrow--left,
+.annotation__arrow--right {
+  width: 40px;
+  height: 24px;
+}

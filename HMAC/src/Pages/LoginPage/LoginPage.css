@@ -1,123 +1,13 @@
-.login-container {
-  display: flex;
-  justify-content: center;
+.login__submit-inner {
+  display: inline-flex;
   align-items: center;
-  height: 100vh;
-  background-color: #502abd;
+  gap: 8px;
 }
 
-.login-box {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  width: 300px;
-  text-align: center;
+.login__arrow {
+  transition: transform 0.25s var(--ease-out);
 }
 
-h2 {
-  color: #502abd;
-}
-
-.inputBox {
-  position: relative;
-  width: 280px;
-  margin-top: 10%;
-}
-
-
-.inputBox input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid rgba(0, 0, 0, 1);
-  background: white;
-  border-radius: 5px;
-  outline: none;
-  color: #000000;
-  font-size: 1em;
-  transition: 0.5s;
-}
-
-
-.inputBox span {
-  position: absolute;
-  left: 0;
-  top: 0;
-  padding: 10px;
-  pointer-events: none;
-  font-size: 1em;
-  color: rgba(0, 0, 0, 1);
-  text-transform: uppercase;
-  transition: 0.5s;
-}
-
-.inputBox input:valid~span,
-.inputBox input:focus~span {
-  color: black;
-  transform: translateX(10px) translateY(-7px);
-  font-size: 0.65em;
-  padding: 0 10px;
-  background: white;
-  border-left: 1px solid #502abd;
-  border-right: 1px solid #502abd;
-  letter-spacing: 0.2rem;
-}
-
-.inputBox input:valid,
-.inputBox input:focus {
-  border: 1px solid #502abd;
-}
-
-.submitbutton {
-  font-family: "Roboto", sans-serif;
-  text-transform: uppercase;
-  margin-top: 10%;
-  outline: 0;
-  background: #502abd;
-  width: 100%;
-  border: 0;
-  padding: 15px;
-  color: #FFFFFF;
-  font-size: 14px;
-  -webkit-transition: all 0.3 ease;
-  transition: all 0.3 ease;
-  cursor: pointer;
-}
-
-.submitbutton:hover,
-.submitbutton:active,
-.submitbutton:focus {
-  background: #C0C0C0;
-}
-
-.message {
-  margin: 15px 0 0;
-  color: #5d5d5d;
-  font-size: 14px;
-}
-
-.message Link {
-  color: #502abd;
-  text-decoration: none;
-}
-
-.message Link:hover {
-  text-decoration: underline;
-}
-
-@media screen and (max-width: 720px) {
-  .login-box {
-    height: 40vh;
-    width: 40vw;
-    min-height: 35vh;
-    min-width: 190px;
-  }
-
-  .inputBox {
-    position: relative;
-    width: 36vw;
-    min-width: 165px;
-    margin-top: 10%;
-  }
-
+.login__submit:hover .login__arrow {
+  transform: translateX(4px);
 }

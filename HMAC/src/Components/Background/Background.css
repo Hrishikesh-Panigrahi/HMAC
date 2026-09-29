@@ -1,0 +1,65 @@
+.paper-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--paper);
+  transition: background-color 0.4s var(--ease-out);
+}
+
+.paper-bg__rules {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 35px, var(--rule) 35px, var(--rule) 36px);
+  background-position: 0 20px;
+}
+
+/* Double red margin line, like a legal pad */
+.paper-bg__margin {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--margin-x);
+  width: 5px;
+  border-left: 1.5px solid var(--margin-line);
+  border-right: 1px solid var(--margin-line);
+  opacity: 0.85;
+}
+
+.paper-bg__holes span {
+  position: absolute;
+  left: 20px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--paper-deep);
+  box-shadow:
+    inset 2px 2px 3px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.paper-bg__holes span:nth-child(1) {
+  top: 18%;
+}
+
+.paper-bg__holes span:nth-child(2) {
+  top: 50%;
+}
+
+.paper-bg__holes span:nth-child(3) {
+  top: 82%;
+}
+
+.paper-bg__grain {
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+}
+
+@media (max-width: 899px) {
+  .paper-bg__margin,
+  .paper-bg__holes {
+    display: none;
+  }
+}

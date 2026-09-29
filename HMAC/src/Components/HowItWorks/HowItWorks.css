@@ -1,0 +1,115 @@
+.modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(20, 18, 12, 0.42);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.modal {
+  width: 100%;
+  max-width: 540px;
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 32px 30px 26px;
+  box-shadow: var(--shadow-lift);
+}
+
+.modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.modal__header h2 {
+  margin-top: 12px;
+  font-family: var(--font-serif);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.steps {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+/* Numbers circled in red pen */
+.steps__number {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 34px;
+  font-family: var(--font-hand);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--red);
+}
+
+.steps__number::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--red);
+  border-radius: 55% 45% 50% 50% / 50% 55% 45% 50%;
+  transform: rotate(-8deg);
+}
+
+.steps__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 4px;
+}
+
+.steps__text > span {
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+
+.modal__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1.5px dashed var(--ink-line);
+}
+
+.modal__swatch {
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  mix-blend-mode: var(--hl-blend);
+  border-radius: 2px 6px 3px 7px / 5px 3px 6px 2px;
+}
+
+.modal__swatch--low {
+  background: var(--hl-green);
+}
+
+.modal__swatch--medium {
+  background: var(--hl-orange);
+}
+
+.modal__swatch--high {
+  background: var(--hl-pink);
+}

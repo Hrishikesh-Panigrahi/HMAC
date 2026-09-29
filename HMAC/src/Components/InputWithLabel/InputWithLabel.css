@@ -1,0 +1,184 @@
+/* Fields are writing lines: no box, just an ink baseline that a blue pen stroke draws over on focus. */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__control {
+  position: relative;
+}
+
+.field__control::before,
+.field__control::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+/* Baseline */
+.field__control::before {
+  height: 1.5px;
+  background: var(--ink-border);
+  opacity: 0.55;
+  transition: opacity 0.2s;
+}
+
+/* Pen stroke on focus */
+.field__control::after {
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--blue);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.field__control:focus-within::after {
+  transform: scaleX(1);
+}
+
+.field__control:hover::before {
+  opacity: 1;
+}
+
+.field input {
+  width: 100%;
+  height: 56px;
+  padding: 22px 2px 6px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+}
+
+.field--with-icon input {
+  padding-left: 32px;
+}
+
+.field input:disabled {
+  color: var(--ink-subtle);
+  cursor: not-allowed;
+}
+
+.field:has(.field__reveal) input {
+  padding-right: 44px;
+}
+
+.field label {
+  position: absolute;
+  top: 60%;
+  left: 2px;
+  transform: translateY(-50%);
+  transform-origin: left center;
+  color: var(--ink-subtle);
+  font-size: 16px;
+  pointer-events: none;
+  transition:
+    top 0.2s var(--ease-out),
+    transform 0.2s var(--ease-out),
+    color 0.2s var(--ease-out),
+    letter-spacing 0.2s var(--ease-out);
+}
+
+.field--with-icon label {
+  left: 32px;
+}
+
+/* Floated label becomes a small mono caption */
+.field input:focus + label,
+.field input:not(:placeholder-shown) + label {
+  top: 12px;
+  transform: translateY(-50%) scale(0.72);
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.field input:focus + label {
+  color: var(--blue);
+}
+
+.field__icon {
+  position: absolute;
+  top: 60%;
+  left: 2px;
+  transform: translateY(-50%);
+  color: var(--ink-subtle);
+  pointer-events: none;
+  transition: color 0.2s var(--ease-out);
+}
+
+.field__control:focus-within .field__icon {
+  color: var(--blue);
+}
+
+.field__reveal {
+  position: absolute;
+  top: 60%;
+  right: 0;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink-subtle);
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.field__reveal:hover {
+  color: var(--ink);
+  background: var(--paper-hover);
+}
+
+/* Errors get a red squiggle, like a spelling mistake */
+.field--error .field__control::before {
+  height: 6px;
+  bottom: -2px;
+  opacity: 1;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 4 Q 2.5 0 5 3 T 10 3' fill='none' stroke='%23cf3a28' stroke-width='1.6'/%3E%3C/svg%3E") repeat-x;
+}
+
+:root[data-theme="dark"] .field--error .field__control::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 4 Q 2.5 0 5 3 T 10 3' fill='none' stroke='%23ff6b57' stroke-width='1.6'/%3E%3C/svg%3E");
+}
+
+.field--error .field__control::after {
+  background: var(--red);
+}
+
+.field--error input + label,
+.field--error .field__icon {
+  color: var(--red) !important;
+}
+
+.field__error,
+.field__hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.field__error {
+  font-family: var(--font-hand);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--red);
+}
+
+.field__hint {
+  color: var(--ink-subtle);
+  font-size: 12.5px;
+}
