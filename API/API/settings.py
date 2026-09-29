@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,7 +31,13 @@ load_dotenv(BASE_DIR / '.env')
 # Word-detection model used by the OCR step (helper.roboflowHelperFunc).
 ROBOFLOW_API_KEY = os.environ.get('ROBOFLOW_API_KEY', '')
 
-SECRET_KEY = 'django-insecure-2jds*wiudut860=c%bi97*mf=59na)atca2g0+w9nv5^5%j6(9'
+# Signs sessions and login tokens (simplejwt uses it too), so it must stay private.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
+if not SECRET_KEY:
+    raise ImproperlyConfigured(
+        'Set DJANGO_SECRET_KEY in API/.env (see API/.env.example). Generate one with: python -c '
+        '"from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"'
+    )
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
