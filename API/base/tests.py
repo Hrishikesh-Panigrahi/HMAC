@@ -1,11 +1,15 @@
+import os
+from io import StringIO
 from itertools import permutations
+from unittest import mock
 
+from django.core.management import CommandError, call_command
 from django.db.models.signals import post_save
 from django.test import SimpleTestCase, TestCase
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from . import demo_data, signals
+from . import demo_data, helper, signals
 from .evaluation import TYPICAL_WER, detection_rates, evaluate
 from .models import Assignment, FileComparisonModel, FileModel, OcrResult, TxtFileModel, User
 from .similarity import (
@@ -76,6 +80,45 @@ class PhraseSimilarityTests(SimpleTestCase):
         self.assertEqual(similarity_level(0.25, class_median=0.02), "high")
         self.assertEqual(similarity_level(0.25, class_median=0.20), "medium")
         self.assertEqual(similarity_level(0.05, class_median=0.0), "low")
+
+
+class OcrWorkFolderTests(SimpleTestCase):
+    def test_word_crops_are_removed_even_when_ocr_fails(self):
+        seen = {}
+
+        def detect_then_crash(instance, work_dir):
+            seen["dir"] = work_dir
+            open(os.path.join(work_dir, "words_1.jpg"), "wb").close()
+            raise RuntimeError("word detector unavailable")
+
+        with mock.patch.object(helper, "roboflowHelperFunc", side_effect=detect_then_crash):
+            with self.assertRaises(RuntimeError):
+                helper.transcribe_page(object())
+        self.assertFalse(os.path.exists(seen["dir"]))
+
+    def test_each_upload_gets_its_own_folder(self):
+        folders = []
+        with mock.patch.object(helper, "roboflowHelperFunc", side_effect=lambda instance, d: folders.append(d) or []), \
+                mock.patch.object(helper, "ocrHelperFunc", return_value="transcribed"):
+            self.assertEqual(helper.transcribe_page(object()), "transcribed")
+            helper.transcribe_page(object())
+        self.assertNotEqual(folders[0], folders[1])
+
+
+class AddUserCommandTests(TestCase):
+    def test_creates_a_working_hashed_account(self):
+        with mock.patch("getpass.getpass", side_effect=["correct horse", "correct horse"]):
+            call_command("add_user", "Prof@School.Test", name="A Professor", professor=True, stdout=StringIO())
+        user = User.objects.get(email="Prof@school.test")
+        self.assertTrue(user.is_active and user.is_staff)
+        self.assertTrue(user.check_password("correct horse"))
+        self.assertNotIn("correct horse", user.password)
+
+    def test_rejects_mismatched_passwords(self):
+        with mock.patch("getpass.getpass", side_effect=["correct horse", "wrong horse"]):
+            with self.assertRaises(CommandError):
+                call_command("add_user", "s@school.test", name="Student", stdout=StringIO())
+        self.assertFalse(User.objects.filter(email="s@school.test").exists())
 
 
 class TunedThresholdTests(SimpleTestCase):
