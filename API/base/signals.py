@@ -74,7 +74,7 @@ def convert_pdf_to_image(sender, instance, created, **kwargs):
 @receiver(post_save, sender=FileImage)
 def create_ai_detection(sender, instance, created, **kwargs):
     if created:
-        model_path = 'C:/Users/Nandini/Documents/GitHub/HMAC/API/new-model'
+        model_path = os.path.join(settings.BASE_DIR, 'new-model')
         tokenizer = DistilBertTokenizer.from_pretrained(
             "distilbert-base-uncased")
         num_labels = 2
