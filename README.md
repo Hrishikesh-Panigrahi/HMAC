@@ -7,6 +7,12 @@ HMAC checks handwritten assignments. Students upload a scanned PDF; HMAC reads t
 | `API/` | Django + Django REST Framework backend (`API/base` is the app) |
 | `HMAC/` | React + Vite frontend |
 
+## Publication
+
+HMAC is described in our paper: <https://doi.org/10.6977/IJoSI.202506_9(3).0005>
+
+Duplicate detection has changed since the paper. The original word-frequency (TF-IDF) comparison was replaced with phrase matching within each assignment, which ignores the question paper and wording most of the class shares. We're continuing to iterate on the pipeline as newer OCR, AI-detection and similarity models come out.
+
 ## How a submission is processed
 
 1. The student picks an assignment and uploads a PDF (`POST /api/v1/Upload/`).
