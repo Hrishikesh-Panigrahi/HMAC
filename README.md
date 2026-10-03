@@ -112,6 +112,5 @@ The evaluation set is synthetic. Once you have real submissions, re-run `evaluat
 
 - Only the first page of each PDF is processed, to keep uploads fast enough.
 - Processing runs inside the upload request rather than a background job.
-- The AI-detection model is not reliable: it rates most text as AI-written, including human-written text. Treat its score with caution.
 - There is no self sign-up; accounts are created with `add_user`.
 - Logins expire after 60 minutes and aren't renewed automatically.
