@@ -1,3 +1,4 @@
+// TODO(roadmap:ai-detector-bakeoff): set the AI-score thresholds from the chosen detector's calibration.
 // Scores from the API are percentages (0–100). Thresholds match the original UI:
 // under 50 is fine, 50–74 is worth a look, 75+ is flagged.
 export const clampScore = (value) => {

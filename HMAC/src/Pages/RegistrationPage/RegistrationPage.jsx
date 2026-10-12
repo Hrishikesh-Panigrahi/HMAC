@@ -48,7 +48,8 @@ const RegistrationPage = () => {
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
-    // The API has no sign-up endpoint yet, so accounts are created by an admin.
+    // TODO(roadmap:signup-and-refresh): the API has no sign-up endpoint yet, so accounts are
+    // created with `manage.py add_user`.
     toast.info("Self sign-up isn't available yet", {
       description: "Ask your professor or an admin to create your account, then sign in.",
     });

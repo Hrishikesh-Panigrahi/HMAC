@@ -27,6 +27,8 @@ from django.db.models import Q
 # measured on real transcriptions. Exact 5-word phrases lost most copies to OCR
 # noise (a whole copied answer scored ~35%); 4-word phrases that may differ in one
 # word kept honest answers low and caught copies.
+# TODO(roadmap:real-eval-set): the evaluation answers are synthetic; re-tune these constants
+# on real submissions.
 PHRASE_LENGTH = 4
 # Let a phrase match with one word different (OCR slips, a word changed while copying).
 FUZZY_MATCH = True
@@ -132,6 +134,8 @@ def _spans(doc, starts):
     return spans
 
 
+# TODO(roadmap:paraphrase-check): add sentence-embedding matches far above the class baseline,
+# to catch heavy rewording; evaluate with manage.py evaluate_similarity before shipping.
 def compare(a, b, ignored=frozenset()):
     """Return (share of a's phrases found in b, share of b's found in a, a's spans, b's spans)."""
     counted_a, starts_a = _matches(a, b, ignored)

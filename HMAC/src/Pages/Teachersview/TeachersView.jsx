@@ -24,6 +24,8 @@ const tabPanel = {
   exit: { opacity: 0, x: -18, rotate: -0.6 },
 };
 
+// TODO(roadmap:real-review-page): load a real submission (PDF, transcription, scores) instead of
+// the sample PDF and placeholder text below.
 const TeachersView = () => {
   const [tab, setTab] = useState("result");
 

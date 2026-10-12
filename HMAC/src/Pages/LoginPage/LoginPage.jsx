@@ -27,6 +27,7 @@ const LoginPage = () => {
     };
 
     try {
+      // TODO(roadmap:api-url-config): use API_BASE from utils/api.js.
       const response = await axios.post(
         "http://127.0.0.1:8000/api/v1/login/",
         user,

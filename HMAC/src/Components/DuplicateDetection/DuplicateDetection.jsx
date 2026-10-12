@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ScoreRing from "../ScoreRing/ScoreRing";
 
-// Placeholder score until this view is wired to real similarity results.
+// TODO(roadmap:real-review-page): placeholder score until the Review page shows a real submission.
 const getRandomInitialValue = () => Math.floor(Math.random() * 101);
 
 const DuplicateDetection = ({ delay }) => {

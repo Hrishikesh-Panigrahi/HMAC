@@ -27,6 +27,8 @@ const CARD_TILT = [-1.4, 0.9, -0.6, 1.3];
 
 const average = (values) => (values.length ? values.reduce((sum, v) => sum + v, 0) / values.length : 0);
 
+// TODO(roadmap:copy-network): add a graph of flagged pairs per assignment to show copying groups.
+// TODO(roadmap:answer-coverage): show which key points of the model answer each submission covers.
 const SubmissionSummary = () => {
   const [data, setData] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | ready | error | unauthorized

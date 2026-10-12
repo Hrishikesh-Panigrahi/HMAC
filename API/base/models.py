@@ -149,6 +149,8 @@ class FileComparisonModel(models.Model):
     def __str__(self):
         return f"Comparison between {self.uploaded_file.filename} and {self.other_file.filename}"
 
+# TODO(roadmap:ocr-confidence): store how confident the OCR was, so the UI can warn when
+# scores rest on a poor transcription.
 class OcrResult(models.Model):
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     submission = models.ForeignKey(FileModel, on_delete=models.CASCADE, null=True, blank=True, related_name="ocr_results")

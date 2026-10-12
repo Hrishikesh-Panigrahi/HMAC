@@ -33,7 +33,7 @@ def convert_pdf_to_image(sender, instance, created, **kwargs):
             pdf_path=instance.file.path,
             dpi=200,
             first_page=1,
-            last_page=1,
+            last_page=1,  # TODO(roadmap:all-pages): process every page once OCR is fast enough.
             fmt=COVER_PAGE_FORMAT,
             output_folder=cover_page_dir,
             # None means "find Poppler on PATH"; set POPPLER_PATH in API/.env otherwise.
@@ -69,10 +69,13 @@ def convert_pdf_to_image(sender, instance, created, **kwargs):
         instance.save()
 
 
+# TODO(roadmap:background-jobs): this chain (OCR, AI detection, similarity) runs inside the
+# upload request; move it to a background worker.
 @receiver(post_save, sender=FileImage)
 def create_ai_detection(sender, instance, created, **kwargs):
     if created:
         model_path = os.path.join(settings.BASE_DIR, 'new-model')
+        # TODO(roadmap:load-models-once): loaded on every upload; load once per process.
         tokenizer = DistilBertTokenizer.from_pretrained(
             "distilbert-base-uncased")
         num_labels = 2
@@ -150,6 +153,7 @@ def create_ai_detection(sender, instance, created, **kwargs):
 
         newText = filtered_sentence
 
+        # TODO(roadmap:ai-detector-bakeoff): replace with the detector that wins the bake-off.
         # The model reads at most 512 tokens; longer answers are cut there instead of crashing.
         inputs = tokenizer(ogtext, return_tensors="pt", truncation=True, max_length=512)
 

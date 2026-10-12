@@ -7,6 +7,8 @@ from roboflow import Roboflow
 import cv2
 
 
+# TODO(roadmap:ocr-bakeoff): replace Roboflow word detection + TrOCR with the page-level OCR
+# model that wins the bake-off (also removes the external API and its key).
 def transcribe_page(instance):
     """Find the words on a page image and read them with TrOCR.
 
@@ -144,6 +146,8 @@ def ocrHelperFunc(lines, work_dir):
     print(f"Predicted Words: {predicted_words_string}")
     return predicted_words_string
 
+# TODO(roadmap:load-models-once): TrOCR is reloaded for every batch of 10 words; load it once.
+# TODO(roadmap:upgrade-ml-deps): loading TrOCR segfaults with torch 2.1 + transformers 4.34 on the dev laptop.
 def generate_ocr_batch(image_batch):
     from transformers import TrOCRProcessor, VisionEncoderDecoderModel
     import requests

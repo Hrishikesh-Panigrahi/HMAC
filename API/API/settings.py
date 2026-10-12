@@ -44,6 +44,7 @@ if not SECRET_KEY:
     )
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# TODO(roadmap:deploy-settings): read DEBUG, ALLOWED_HOSTS and the CORS origins from API/.env.
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -91,6 +92,8 @@ REST_FRAMEWORK = {
     ],
 }
 
+# TODO(roadmap:signup-and-refresh): the frontend never refreshes these, so users are
+# signed out when the access token expires.
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Set the token expiration time as needed.
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),

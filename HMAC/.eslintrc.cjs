@@ -11,6 +11,8 @@ module.exports = {
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: '18.2' } },
   plugins: ['react-refresh'],
+  // TODO(roadmap:lint-proptypes): `npm run lint` fails on react/prop-types (inherited from
+  // plugin:react/recommended) because no component declares PropTypes; add them or turn it off.
   rules: {
     'react-refresh/only-export-components': [
       'warn',

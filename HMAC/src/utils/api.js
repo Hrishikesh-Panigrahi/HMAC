@@ -1,3 +1,4 @@
+// TODO(roadmap:api-url-config): read from import.meta.env.VITE_API_URL so a deployed frontend can reach its API.
 export const API_BASE = "http://localhost:8000/api/v1";
 
 // Authorization header for the JWT saved at login (empty when signed out).
