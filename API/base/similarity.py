@@ -23,8 +23,8 @@ from django.db import transaction
 from django.db.models import Q
 
 # Tuned with manage.py evaluate_similarity: 20 independent answers to 4 questions,
-# copies made from them, and simulated OCR slips at the 10-20% word error rate
-# measured on real transcriptions. Exact 5-word phrases lost most copies to OCR
+# copies made from them, and simulated OCR slips at a 10% word error rate (about what
+# was measured on real handwriting) and 20% as a stress test. Exact 5-word phrases lost most copies to OCR
 # noise (a whole copied answer scored ~35%); 4-word phrases that may differ in one
 # word kept honest answers low and caught copies.
 # TODO(roadmap:real-eval-set): the evaluation answers are synthetic; re-tune these constants

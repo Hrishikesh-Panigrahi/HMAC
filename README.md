@@ -110,7 +110,7 @@ Run from `API/` with the virtualenv active.
 
 ## Duplicate detection accuracy
 
-The thresholds in `API/base/similarity.py` were tuned with `evaluate_similarity`: 20 independent answers to 4 questions, copies generated from them, and simulated OCR errors at the 10–20% word error rate measured on real transcriptions. At typical OCR quality, no honest answer was flagged, while every whole-answer copy was. Copying only a sentence or two is often missed.
+The thresholds in `API/base/similarity.py` were tuned with `evaluate_similarity`: 20 independent answers to 4 questions, copies generated from them, and simulated OCR errors at a 10% word error rate (about what the current pipeline gets on real handwriting) plus 20% as a stress test. At typical OCR quality, no honest answer was flagged, while every whole-answer copy was. Copying only a sentence or two is often missed.
 
 The evaluation set is synthetic. Once you have real submissions, re-run `evaluate_similarity` and adjust the constants at the top of `similarity.py`.
 

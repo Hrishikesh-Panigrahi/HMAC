@@ -21,8 +21,9 @@ SENTENCE_RE = re.compile(r"(?<=[.!?])\s+")
 LETTERS = "abcdefghijklmnopqrstuvwxyz"
 FILLERS = ["a", "the", "it", "of", "on", "is"]
 
-# TrOCR word error rates measured on the stored transcriptions were 1-10% for full
-# answers (23% on one short, partial one), so 10% is typical and 20% is bad handwriting.
+# The current pipeline's word error rate on the stored sample pages was 8-10% on real
+# handwriting (1% on a page typed in a handwriting font), so 10% is typical; 20% is a
+# stress test for messier handwriting.
 TYPICAL_WER = 0.10
 BAD_WER = 0.20
 

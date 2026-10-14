@@ -24,6 +24,8 @@ git grep -n "roadmap:background-jobs"
 
 The laptop (4 GB GPU, 7 GB RAM) can't run the newer models at a usable speed: page-level OCR took 3–55 minutes per page on CPU, and one model ran out of memory. The free Colab tier is enough for a bake-off, and it keeps the model downloads off the laptop.
 
+The bake-off is ready to run in [`research/model_bakeoff.ipynb`](research/model_bakeoff.ipynb) ([open in Colab](https://colab.research.google.com/github/Hrishikesh-Panigrahi/HMAC/blob/main/research/model_bakeoff.ipynb)). Claude Code can also run it in an open notebook through Google's [Colab MCP server](https://github.com/googlecolab/colab-mcp).
+
 | Tag | What | Where |
 |---|---|---|
 | `ocr-bakeoff` | Compare the current Roboflow + TrOCR pipeline with page-level OCR models on real handwritten pages, measuring word and character error rate against typed transcripts. Candidates that fit a free T4 in float16: `zai-org/GLM-OCR` (1.3B, MIT), `datalab-to/surya-ocr-2` (0.7B; weights free for research, personal use and small startups), `nanonets/Nanonets-OCR2-3B`, `deepseek-ai/DeepSeek-OCR-2` (3.4B), `datalab-to/chandra-ocr-2` (5.3B, tight). The winner replaces Roboflow + TrOCR, which also removes the external API and its key. | `API/base/helper.py` |
