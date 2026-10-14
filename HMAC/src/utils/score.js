@@ -1,6 +1,6 @@
-// TODO(roadmap:ai-detector-bakeoff): set the AI-score thresholds from the chosen detector's calibration.
-// Scores from the API are percentages (0–100). Thresholds match the original UI:
-// under 50 is fine, 50–74 is worth a look, 75+ is flagged.
+// Scores from the API are percentages (0–100). The API also sends a level for each score
+// (ai_level, similarity_level), set by the backend's calibration; prefer it. These 50/75
+// thresholds are only a fallback for scores without one.
 export const clampScore = (value) => {
   const numeric = Number(value);
   if (!Number.isFinite(numeric)) return 0;
@@ -19,5 +19,3 @@ export const TONE_LABEL = {
   medium: "Medium",
   high: "High",
 };
-
-export const isFlagged = (value) => clampScore(value) >= 75;

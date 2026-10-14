@@ -159,7 +159,12 @@ const StudentRecord = ({ data, loading, hasFilters, onResetFilters, onCompare })
                       <span className="ledger__na">not scored</span>
                     ) : (
                       <div className="ledger__stack">
-                        <SlidingIndicator label={`AI detection for ${name}`} value={aiScore.toFixed(2)} delay={0.25 + rowDelay} />
+                        <SlidingIndicator
+                          label={`AI detection for ${name}`}
+                          value={aiScore.toFixed(2)}
+                          tone={item.ai_level ?? undefined}
+                          delay={0.25 + rowDelay}
+                        />
                         {item.ai_confidence === "low" && (
                           <span className="ledger__caution" title={`Only ${item.word_count} words: too short for a reliable AI score`}>
                             low confidence · {item.word_count} words

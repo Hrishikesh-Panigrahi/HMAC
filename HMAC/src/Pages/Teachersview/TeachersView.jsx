@@ -119,8 +119,10 @@ const TeachersView = () => {
                       AI-generated content
                     </h3>
                     <p>
-                      The transcribed text is scored by a DistilBERT classifier trained to tell human and AI writing
-                      apart. The number is its probability that the text is AI-written.
+                      The transcribed text is scored by a DeBERTa-v3 detector trained to tell human and AI writing
+                      apart. The number is its probability that the text is AI-written. It catches most text from
+                      widely used chatbots but often misses the newest models. Answers under 100 words are marked
+                      low confidence and aren&apos;t flagged on this score.
                     </p>
                   </section>
                   <section>
@@ -138,9 +140,9 @@ const TeachersView = () => {
                   </section>
                   <div className="review-explain__legend">
                     <span className="review-explain__legend-label">AI</span>
-                    <span className="hl hl--green">under 50% · low</span>
-                    <span className="hl">50–74% · worth a look</span>
-                    <span className="hl hl--pink">75%+ · flagged</span>
+                    <span className="hl hl--green">under 80% · low</span>
+                    <span className="hl">80–94% · worth a look</span>
+                    <span className="hl hl--pink">95%+ · flagged</span>
                   </div>
                   <div className="review-explain__legend">
                     <span className="review-explain__legend-label">Duplicate</span>

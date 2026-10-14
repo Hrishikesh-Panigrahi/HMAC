@@ -5,7 +5,7 @@ import "./HowItWorks.css";
 const STEPS = [
   { title: "Upload a PDF", text: "Students pick the assignment and upload a scanned, handwritten answer." },
   { title: "Handwriting is read", text: "The first page is turned into an image and transcribed with OCR." },
-  { title: "AI detection", text: "A DistilBERT classifier estimates how likely the text is AI-generated." },
+  { title: "AI detection", text: "A DeBERTa-v3 detector estimates how likely the text is AI-generated." },
   {
     title: "Duplicate check",
     text: "The answer is compared with the others for the same assignment, looking for shared 4-word phrases (one word may differ, for OCR slips). Phrases from the question paper, and ones most of the class uses, are ignored.",

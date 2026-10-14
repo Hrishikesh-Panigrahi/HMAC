@@ -11,7 +11,7 @@ git grep -n "roadmap:background-jobs"
 | Tag | What | Where |
 |---|---|---|
 | `background-jobs` | OCR, AI detection and similarity all run inside the upload request, so a student waits minutes and the request can time out. Run them in a background worker (e.g. django-q2, or Celery + Redis) and show a "processing" state. | `API/base/signals.py`, `API/base/views.py` |
-| `load-models-once` | TrOCR is reloaded for every batch of 10 words and DistilBERT for every upload. Load each once per process. | `API/base/helper.py`, `API/base/signals.py` |
+| `load-models-once` | TrOCR is reloaded for every batch of 10 words. Load it once per process, like the AI detector in `API/base/ai_detection.py`. | `API/base/helper.py` |
 | `upgrade-ml-deps` | On the dev laptop, PyTorch 2.1 + transformers 4.34 crash (segfault) loading TrOCR. Upgrade both and re-run the tests. | `API/requirements.txt` |
 | `real-review-page` | The Review page shows a sample PDF, placeholder text and a random duplicate score. Load a real submission instead (PDF, transcription, scores, compare). | `HMAC/src/Pages/Teachersview/`, `HMAC/src/Components/DuplicateDetection/` |
 | `user-admin` | `User` is registered in the Django admin as a plain model, so passwords set there are saved unhashed. Use a `UserAdmin`. Until then, use `manage.py add_user`. | `API/base/admin.py` |
@@ -29,7 +29,8 @@ The bake-off is ready to run in [`research/model_bakeoff.ipynb`](research/model_
 | Tag | What | Where |
 |---|---|---|
 | `ocr-bakeoff` | Compare the current Roboflow + TrOCR pipeline with page-level OCR models on real handwritten pages, measuring word and character error rate against typed transcripts. Candidates that fit a free T4 in float16: `zai-org/GLM-OCR` (1.3B, MIT), `datalab-to/surya-ocr-2` (0.7B; weights free for research, personal use and small startups), `nanonets/Nanonets-OCR2-3B`, `deepseek-ai/DeepSeek-OCR-2` (3.4B), `datalab-to/chandra-ocr-2` (5.3B, tight). The winner replaces Roboflow + TrOCR, which also removes the external API and its key. | `API/base/helper.py` |
-| `ai-detector-bakeoff` | Compare the current DistilBERT classifier with `desklib/ai-text-detector-academic-v1.01` and `Oxidane/tmr-ai-text-detector` on labelled human and AI answers, clean and with OCR errors. Look at false positives on human text first, then set the threshold from the results. | `API/base/signals.py`, `HMAC/src/utils/score.js` |
+| `ai-detector-bakeoff` | **Done.** `desklib/ai-text-detector-academic-v1.01` replaced the DistilBERT classifier. On OCR-noised text, with the threshold set so about 5% of human answers are flagged, it caught 93% of ChatGPT answers (DistilBERT 11%, `Oxidane/tmr-ai-text-detector` 64%). It scores the raw OCR text and flags from 0.95, where 2% of the human answers were flagged. | `API/base/ai_detection.py` |
+| `newer-ai-detector` | The detector catches older chatbot text but only 10% of the answers written by a current model. Re-run the bake-off when detectors trained on newer models come out. | `API/base/ai_detection.py` |
 | `all-pages` | Only page 1 is processed, to keep uploads fast. Process every page once OCR is fast enough (GPU, or a faster model from the bake-off). | `API/base/signals.py` |
 
 Working within the free tier:

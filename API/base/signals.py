@@ -7,11 +7,10 @@ import os
 from pdf2image import convert_from_path
 
 from .models import FileModel, FileImage, AIDetection, TxtFileModel, FileComparisonModel, User, FileModel, TxtFileModel, OcrResult
+from .ai_detection import ai_probability
 from .helper import transcribe_page
 from .similarity import recompute_assignment
 
-import torch
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import gensim as gensim
 
 COVER_PAGE_DIRECTORY = 'coverdirectory/'
@@ -74,15 +73,6 @@ def convert_pdf_to_image(sender, instance, created, **kwargs):
 @receiver(post_save, sender=FileImage)
 def create_ai_detection(sender, instance, created, **kwargs):
     if created:
-        model_path = os.path.join(settings.BASE_DIR, 'new-model')
-        # TODO(roadmap:load-models-once): loaded on every upload; load once per process.
-        tokenizer = DistilBertTokenizer.from_pretrained(
-            "distilbert-base-uncased")
-        num_labels = 2
-        Bert_Model = DistilBertForSequenceClassification.from_pretrained(
-            model_path, num_labels=num_labels)
-        Bert_Model.eval()
-
         text = transcribe_page(instance)
 
         import Levenshtein
@@ -153,39 +143,15 @@ def create_ai_detection(sender, instance, created, **kwargs):
 
         newText = filtered_sentence
 
-        # TODO(roadmap:ai-detector-bakeoff): replace with the detector that wins the bake-off.
-        # The model reads at most 512 tokens; longer answers are cut there instead of crashing.
-        inputs = tokenizer(ogtext, return_tensors="pt", truncation=True, max_length=512)
-
-        input_ids = inputs["input_ids"]
-        attention_mask = inputs["attention_mask"]
-
-        with torch.no_grad():
-            outputs = Bert_Model(input_ids, attention_mask)
-            logits = outputs.logits
-
-        probabilities = torch.softmax(logits, dim=1)
-
-        percentage_probs = (probabilities * 100).tolist()[0]
-
-        class_labels = [str(i) for i in range(num_labels)]
-
-        class_percentage_dict = {label: percentage for label,
-                                 percentage in zip(class_labels, percentage_probs)}
-
-        for label, percentage in class_percentage_dict.items():
-            print(f"Class {label}: {percentage:.2f}%")
-
-        detection_results_Human = percentage_probs[0]
-        detection_results_AI = percentage_probs[1]
-
-        print(detection_results_Human)
+        # Score the raw OCR text, not the grammar-corrected one: the detector was calibrated
+        # on text with OCR slips, and it rates clean human writing as AI far more often.
+        detection_results_AI = ai_probability(text) * 100
 
         ai_detection = AIDetection(
             uploaded_by=instance.uploaded_by,
             image=instance,
             filename=instance.filename,
-            detection_results_Human=detection_results_Human,
+            detection_results_Human=100 - detection_results_AI,
             detection_results_AI=detection_results_AI,
         )
         ai_detection.save()

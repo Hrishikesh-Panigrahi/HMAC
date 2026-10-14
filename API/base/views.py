@@ -15,6 +15,7 @@ from .models import Assignment, FileComparisonModel, AIDetection, TxtFileModel, 
 from .serializers import (
     AIDetectionSerializer, AssignmentSerializer, FileModelSerializer, OcrResultSerializer, UserSerializer,
 )
+from .ai_detection import ai_level
 from .similarity import class_median, recompute_assignment, similarity_level, submission_text
 
 # AI-detection scores on shorter answers than this are mostly noise.
@@ -111,6 +112,7 @@ def list_files_for_teacher(request):
         match = closest.get(f.pk)
         score = match.similarity_result if match else 0.0
         ai = ai_results.get(f.submission_id)
+        ai_score = ai.detection_results_AI if ai else None
         words = len(transcripts.get(f.submission_id, "").split())
 
         file_data.append({
@@ -120,7 +122,8 @@ def list_files_for_teacher(request):
             'description': f.description,
             'uploaded_by': user_data(f.uploaded_by),
             'assignment': {'id': assignment_obj.pk, 'title': assignment_obj.title} if assignment_obj else None,
-            'ai_score': ai.detection_results_AI if ai else None,
+            'ai_score': ai_score,
+            'ai_level': ai_level(ai_score / 100) if ai_score is not None else None,
             'ai_confidence': 'low' if words < LOW_CONFIDENCE_WORDS else 'normal',
             'word_count': words,
             'max_similarity': round(score * 100, 2),

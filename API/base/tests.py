@@ -1,29 +1,34 @@
 import os
+import tempfile
 from io import StringIO
 from itertools import permutations
 from unittest import mock
 
 from django.core.management import CommandError, call_command
 from django.db.models.signals import post_save
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from . import demo_data, helper, signals
+from .ai_detection import HIGH_SCORE, MEDIUM_SCORE as AI_MEDIUM_SCORE, ai_level
 from .evaluation import TYPICAL_WER, detection_rates, evaluate
-from .models import Assignment, FileComparisonModel, FileModel, OcrResult, TxtFileModel, User
+from .models import AIDetection, Assignment, FileComparisonModel, FileImage, FileModel, OcrResult, TxtFileModel, User
 from .similarity import (
     MEDIUM_SCORE, MIN_COMMON_PHRASE_DOCS, Document, compare, ignored_phrases, similarity_level,
 )
 
 
 def setUpModule():
-    # Creating a FileModel normally kicks off PDF conversion + OCR; tests insert OCR text directly.
+    # Creating a FileModel normally kicks off PDF conversion, OCR and AI detection; tests insert
+    # OCR text directly, and call the AI-detection receiver themselves.
     post_save.disconnect(signals.convert_pdf_to_image, sender=FileModel)
+    post_save.disconnect(signals.create_ai_detection, sender=FileImage)
 
 
 def tearDownModule():
     post_save.connect(signals.convert_pdf_to_image, sender=FileModel)
+    post_save.connect(signals.create_ai_detection, sender=FileImage)
 
 
 def demo_docs():
@@ -150,6 +155,12 @@ class SubmissionsMixin:
         return TxtFileModel.objects.create(uploaded_by=user, submission=submission, filename=f"{name}.txt",
                                            description="answer", file=f"txtfiles/{name}.txt")
 
+    def add_ai_score(self, row, percent):
+        image = FileImage.objects.create(uploaded_by=row.uploaded_by, pdfFile=row.submission, filename=row.filename,
+                                         description="answer", file=f"fileImages/{row.filename}.jpg")
+        return AIDetection.objects.create(uploaded_by=row.uploaded_by, image=image, filename=row.filename,
+                                          detection_results_AI=percent, detection_results_Human=100 - percent)
+
     def seed_demo(self):
         self.assignment = Assignment.objects.create(title=demo_data.TITLE, reference_text=demo_data.REFERENCE_TEXT)
         self.rows = {}
@@ -172,6 +183,40 @@ class RecomputeTests(SubmissionsMixin, TestCase):
         copy = self.make_submission(self.make_user("outsider", "Outsider"), demo_data.ANSWERS["aarav"][1], other)
         self.assertFalse(FileComparisonModel.objects.filter(uploaded_file=copy).exists())
         self.assertFalse(FileComparisonModel.objects.filter(other_file=copy).exists())
+
+
+class AiDetectionTests(SubmissionsMixin, TestCase):
+    def test_levels(self):
+        self.assertEqual(ai_level(HIGH_SCORE), "high")
+        self.assertEqual(ai_level(AI_MEDIUM_SCORE), "medium")
+        self.assertEqual(ai_level(0.5), "low")
+
+    def test_upload_scores_the_raw_ocr_text(self):
+        user = self.make_user("kiran", "Kiran")
+        submission = FileModel.objects.create(uploaded_by=user, filename="kiran_answer", description="answer",
+                                              file="files/kiran_answer.pdf")
+        image = FileImage.objects.create(uploaded_by=user, pdfFile=submission, filename="kiran_answer",
+                                         description="answer", file="fileImages/kiran_answer.jpg")
+        with tempfile.TemporaryDirectory() as media, override_settings(MEDIA_ROOT=media), \
+                mock.patch.object(signals, "transcribe_page", return_value="the leafs make there food"), \
+                mock.patch.object(signals, "GrammarChecker", return_value="The leaves make their food."), \
+                mock.patch.object(signals, "ai_probability", return_value=0.95) as score:
+            signals.create_ai_detection(sender=FileImage, instance=image, created=True)
+        # The detector was calibrated on text with OCR slips, not on grammar-corrected text.
+        score.assert_called_once_with("the leafs make there food")
+        detection = AIDetection.objects.get(image=image)
+        self.assertAlmostEqual(detection.detection_results_AI, 95)
+        self.assertAlmostEqual(detection.detection_results_Human, 5)
+
+    def test_rescore_command_uses_the_stored_transcription(self):
+        row = self.make_submission(self.make_user("kiran", "Kiran"), "the leafs make there food")
+        detection = self.add_ai_score(row, 99.0)
+        with mock.patch("base.management.commands.rescore_ai_detection.ai_probability", return_value=0.25) as score:
+            call_command("rescore_ai_detection", stdout=StringIO())
+        score.assert_called_once_with("the leafs make there food")
+        detection.refresh_from_db()
+        self.assertAlmostEqual(detection.detection_results_AI, 25)
+        self.assertAlmostEqual(detection.detection_results_Human, 75)
 
 
 class ApiTests(SubmissionsMixin, TestCase):
@@ -204,6 +249,15 @@ class ApiTests(SubmissionsMixin, TestCase):
         self.assertEqual(rows["aarav"]["closest"]["uploaded_by"]["username"], "copied_from_aarav")
         self.assertEqual(rows["rohan"]["similarity_level"], "low")
         self.assertLess(rows["rohan"]["max_similarity"], MEDIUM_SCORE * 100)
+
+    def test_teacher_files_reports_ai_level(self):
+        scores = {"aarav": HIGH_SCORE, "meera": (AI_MEDIUM_SCORE + HIGH_SCORE) / 2, "rohan": AI_MEDIUM_SCORE / 2}
+        for key, probability in scores.items():
+            self.add_ai_score(self.rows[key], probability * 100)
+        response = self.client_for(self.professor).get(f"/api/v1/teacher/files/?assignment={self.assignment.pk}")
+        levels = {row["uploaded_by"]["username"]: row["ai_level"] for row in response.json()["file_data"]}
+        self.assertEqual((levels["aarav"], levels["meera"], levels["rohan"]), ("high", "medium", "low"))
+        self.assertIsNone(levels["sana"])  # not scored
 
     def test_similarity_detail_returns_highlightable_spans(self):
         row = self.rows["partly_from_meera"]
